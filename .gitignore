@@ -1,0 +1,7 @@
+**/__pycache__
+runs/
+.vscode/
+debug/
+data/
+output/
+

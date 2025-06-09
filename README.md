@@ -29,10 +29,10 @@
     <a href="https://www.youtube.com/watch?v=brxygxM1nRk">
         <img src="https://img.shields.io/badge/YouTube-Watch-red?style=flat-square&logo=youtube" alt="YouTube Badge">
     </a>
-    <!-- <a href="https://arxiv.org/abs/XXXX.XXXX">
-        <img src="https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b" alt="arXiv">
-    </a> -->
-    <img src="https://img.shields.io/badge/Status-Code%20Not%20Released-yellow" alt="Status: Demo and Training Code Not Released">
+    <a href="https://arxiv.org/abs/2504.05303">
+        <img src="https://img.shields.io/badge/arXiv-2504.05303-b31b1b" alt="arXiv">
+    </a>
+    <img src="https://img.shields.io/badge/Status-Code%20Released-green" alt="Status: Code Released">
 </h5><br />
 
 <div style="display:flex;">
@@ -45,15 +45,147 @@
     By leveraging the rich visual knowledge of large <span style="color:#cc6600; font-weight:bold;">Vision-Language Models</span>, we address the limited availability of ground-truth 3D interaction data for training, resulting in better generalization to diverse real-world interactions.
 </p>
 
-## Planned Code Release
+## Code Status
 
-We plan to release the code in stages, **starting May 2025**. The following components will be included:
+- ▣ 3D Human Contact Prediction - Using [DAMON](https://deco.is.tue.mpg.de) and [LEMON](https://yyvhang.github.io/LEMON/) datasets
+   - ▣ Training Code
+   - ▣ Evaluation Code
+   - ▣ Demo Code
+- ▣ 3D Object Affordance Prediction - Using [PIAD](https://yyvhang.github.io/publications/IAG/index.html) dataset
+   - ▣ Training Code
+   - ▣ Evaluation Code
+   - ▣ Demo Code
+- ☐ 3D Object Contact Prediction - Using [PICO](https://pico.is.tue.mpg.de) dataset
+   - ☐ Training, Evaluation and Demo Code
+- ☐ Object Shape Retrieval from Single Image
+- ☐ Optimization code for Joint reconstruction
 
-- [ ] Demo code
-- [ ] Script for data preprocessing
-- [ ] Training code
-- [ ] Optimization code for joint reconstruction
+## Installation
 
+### Setup Environment
+
+1. **Install Micromamba** (if not already installed):
+   ```bash
+   curl -Ls https://micro.mamba.pm/api/download/linux-64/latest | tar -xvj bin/micromamba
+   sudo mv bin/micromamba /usr/local/bin/
+   ```
+
+2. **Create and activate environment**:
+   ```bash
+   micromamba create -n interactvlm python=3.10 -c conda-forge
+   micromamba activate interactvlm
+   ```
+
+3. **Install PyTorch with CUDA 12.1**:
+   ```bash
+   pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+   ```
+
+4. **Clone the repository**:
+   ```bash
+   git clone https://github.com/saidwivedi/InteractVLM.git
+   cd InteractVLM
+   ```
+
+5. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   pip install flash-attn --no-build-isolation
+   DS_BUILD_FUSED_ADAM=1 pip install deepspeed==0.15.1
+   ```
+
+## Data and Model Downloads
+
+### Essential Data Files
+
+To run InteractVLM, you need to download essential data files and pre-trained models. We provide a convenient script to handle this process.
+
+### Download Script Usage
+
+1. **Register for access** at [https://interactvlm.is.tue.mpg.de](https://interactvlm.is.tue.mpg.de) to get your credentials
+
+2. **Run the download script**:
+   ```bash
+   bash fetch_data.sh
+   ```
+
+## Code Structure
+
+```
+InteractVLM/
+├── 📁 model/                         # Core model implementation
+│   ├── ..
+├── 📁 datasets/                      # Data loading and processing
+│   ├── ..
+├── 📁 utils/                         # Utility functions
+│   ├── ..
+├── 📁 preprocess_data/               # Data preprocessing scripts
+│   ├── ..
+├── 📁 scripts/                       # Execution scripts
+│   ├── ..
+├── 📁 data/                          # Dataset folders
+│   ├── ..
+├── 📁 trained_models/                # Trained models
+│   ├── ..
+├── 📄 train.py                       # Main training script
+├── 📄 evaluate.py                    # Main evaluation script
+├── 📄 run_demo.py                    # Run Demo
+└── 📄 requirements.txt               # Python dependencies
+```
+
+## Training and Evaluation
+
+### Environment Setup
+
+Before running training or evaluation scripts, ensure CUDA is properly configured:
+
+```bash
+# Set CUDA_HOME environment variable (adjust path based on your CUDA installation)
+export CUDA_HOME=/usr/local/cuda  # or your CUDA installation path
+export PATH=$CUDA_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+```
+
+### Data Generation
+
+To generate the data needed for training, run the following script. We will provide the processed datasets soon.
+
+```bash
+# Generate preprocessed data
+bash scripts/run_datagen.sh
+```
+
+### Training
+
+```bash
+# Run training script with default configuration
+bash scripts/run_train.sh
+```
+
+### Evaluation
+
+#### **Model Weight Preparation**
+If you have trained a new model, prepare the weights for evaluation:
+
+```bash
+# Prepare weights for model 0 (adjust number as needed)
+bash scripts/run_prepare_weights.sh 0
+```
+
+#### **Run Evaluation on Pre-trained Models**
+```bash
+# Evaluate the model on either DAMON or PIAD. Adjust the congfiguration accordingly
+bash scripts/run_eval.sh
+```
+
+### Demo
+
+Run the interactive demo on your own images:
+
+```bash
+# Run demo script
+bash scripts/run_demo.sh
+```
 
 ## Results
 
@@ -96,7 +228,7 @@ If you find this code useful for your research, please consider citing the follo
 
 ```bibtex
 @inproceedings{dwivedi_interactvlm_2025,
-    title     = {{InteractVLM: 3D Interaction Reasoning from 2D Foundational Models}},
+    title     = {{InteractVLM}: {3D} Interaction Reasoning from {2D} Foundational Models},
     author    = {Dwivedi, Sai Kumar and Antić, Dimitrije and Tripathi, Shashank and Taheri, Omid and Schmid, Cordelia and Black, Michael J. and Tzionas, Dimitrios},
     booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
     month     = {June},
