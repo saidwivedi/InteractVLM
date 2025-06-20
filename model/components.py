@@ -217,13 +217,6 @@ class HumanContact3DPredictor(nn.Module):
         self.pixel_to_vertex_map = torch.from_numpy(np.array(pixel_to_vertex_list))
         self.bary_coord_map = torch.from_numpy(np.array(bary_coord_list))
 
-        self.grid_positions = [
-            (slice(0, mask_size), slice(0, mask_size)),                     # Human-Top-front
-            (slice(0, mask_size), slice(mask_size, 2*mask_size)),           # Human-Bottom-front
-            (slice(mask_size, 2*mask_size), slice(0, mask_size)),           # Human-Top-back
-            (slice(mask_size, 2*mask_size), slice(mask_size, 2*mask_size))  # Human-Bottom-back
-        ]
-
     def forward(self, seg_maps, ds_names=None):
         device = seg_maps[0].device
         dtype = seg_maps[0].dtype
@@ -238,11 +231,9 @@ class HumanContact3DPredictor(nn.Module):
                 continue
 
             if self.multiview_channels == 1: # Grid format (8x1xHxW)
-                for view_idx, (row_slice, col_slice) in enumerate(self.grid_positions):
-                    view_seg_map = seg_map[0, row_slice, col_slice]
-                    self._process_view(view_seg_map, view_idx, b, pred_3d_contacts, view_count)
-            else:  # Multiview Channels (8xVxHxW)
-                for view_idx in range(self.multiview_channels):
+                NotImplementedError("Grid format deprecated, use multiview_channels > 1")
+            else:  
+                for view_idx in range(self.multiview_channels): # Multiview Channels (8xVxHxW)
                     view_seg_map = seg_map[view_idx]
                     self._process_view(view_seg_map, view_idx, b, pred_3d_contacts, view_count)
         
@@ -291,14 +282,6 @@ class ObjectPCAfford3DPredictor(nn.Module):
         
         mask_size = OBJS_VIEW_DICT[oC_sam_view_type]['mask_size']
 
-        # For grid format if needed
-        self.grid_positions = [
-            (slice(0, mask_size), slice(0, mask_size)),                     # Object-Top-front
-            (slice(0, mask_size), slice(mask_size, 2*mask_size)),           # Object-Bottom-front
-            (slice(mask_size, 2*mask_size), slice(0, mask_size)),           # Object-Top-back
-            (slice(mask_size, 2*mask_size), slice(mask_size, 2*mask_size))  # Object-Bottom-back
-        ]
-
     def forward(self, seg_maps, ds_names=None, mask_paths_list=None):
         
         device = seg_maps[0].device
@@ -315,9 +298,7 @@ class ObjectPCAfford3DPredictor(nn.Module):
             mask_paths = mask_paths_list[b]
 
             if self.multiview_channels == 1:  # Grid format
-                for view_idx, (row_slice, col_slice) in enumerate(self.grid_positions):
-                    view_seg_map = seg_map[0, row_slice, col_slice]
-                    self._process_view(view_seg_map, view_idx, b, pred_3d_affordance, view_count)
+                NotImplementedError("Grid format deprecated, use multiview_channels > 1")
             else:  # Multiview Channels
                 for view_idx in range(self.multiview_channels):
                     view_seg_map = seg_map[view_idx]
@@ -372,26 +353,9 @@ class ObjectMeshContact3DPredictor(nn.Module):
         
         mask_size = OBJS_VIEW_DICT[oC_sam_view_type]['mask_size']
 
-        self.grid_positions = [
-            (slice(0, mask_size), slice(0, mask_size)),                     # Object-Top-front
-            (slice(0, mask_size), slice(mask_size, 2*mask_size)),           # Object-Bottom-front
-            (slice(mask_size, 2*mask_size), slice(0, mask_size)),           # Object-Top-back
-            (slice(mask_size, 2*mask_size), slice(mask_size, 2*mask_size))  # Object-Bottom-back
-        ]
+    def forward_train(self, seg_maps, device, dtype, ds_names=None, mask_paths_list=None):
 
-    def forward(self, seg_maps, ds_names=None, mask_paths_list=None, lift2d_dict_path=None):
-        device = seg_maps[0].device
-        dtype = seg_maps[0].dtype
-
-        if 'ocontact' not in ds_names[0]:
-            return torch.zeros((1, 0), device=device, dtype=dtype)
-
-        # batch_size should be one since different objects have different number of vertices
-        batch_size = len(seg_maps)
-        assert batch_size == 1, "Batch size should be 1 since different objects have different number of vertices"
-
-        # TODO: Add provision for inference lift2d_dict_path
-
+        batch_size = 1  # batch_size should be one since different objects have different number of vertices
         num_vertices = np.load(mask_paths_list[0][0].replace('mask', 'p2vmap').replace('.png', '.npz'))['num_vertices']
         pred_3d_contacts = torch.zeros((batch_size, num_vertices), device=device, dtype=dtype)
         view_count = torch.zeros((batch_size, num_vertices), device=device, dtype=dtype)
@@ -420,6 +384,59 @@ class ObjectMeshContact3DPredictor(nn.Module):
         pred_3d_contacts[valid_vertices] /= view_count[valid_vertices]
         
         return pred_3d_contacts
+
+    def forward_inference(self, seg_maps, device, dtype, ds_names=None, lift2d_dict_path=None):
+
+        batch_size = 1  # batch_size should be one since different objects have different number of vertices
+        lift2d_dict = jl.load(lift2d_dict_path)
+        num_vertices = lift2d_dict['num_vertices']
+        pixel_to_vertex_maps = np.stack(lift2d_dict['pixel_to_vertices_map'])
+        bary_coord_maps = np.stack(lift2d_dict['bary_coords_map'])
+
+        print(f"Num vertices: {num_vertices}")
+
+        pred_3d_contacts = torch.zeros((batch_size, num_vertices), device=device, dtype=dtype)
+        view_count = torch.zeros((batch_size, num_vertices), device=device, dtype=dtype)
+        
+        pixel_to_vertex_maps = torch.from_numpy(pixel_to_vertex_maps).to(device)
+        bary_coord_maps = torch.from_numpy(bary_coord_maps).to(device, dtype=dtype)
+        
+        for b, (seg_map, ds_name) in enumerate(zip(seg_maps, ds_names)):
+
+            for view_idx in range(self.multiview_channels):
+                view_seg_map = seg_map[view_idx]
+                self._process_view(
+                    view_seg_map,
+                    pixel_to_vertex_maps[view_idx],
+                    bary_coord_maps[view_idx],
+                    b,
+                    pred_3d_contacts,
+                    view_count
+                )
+        
+        valid_vertices = view_count > 0
+        pred_3d_contacts[valid_vertices] /= view_count[valid_vertices]
+        
+        return pred_3d_contacts
+
+
+    def forward(self, seg_maps, ds_names=None, mask_paths_list=None, lift2d_dict_path=None):
+        device = seg_maps[0].device
+        dtype = seg_maps[0].dtype
+
+        if 'ocontact' not in ds_names[0]:
+            return torch.zeros((1, 0), device=device, dtype=dtype)
+
+        # batch_size should be one since different objects have different number of vertices
+        batch_size = len(seg_maps)
+        assert batch_size == 1, "Batch size should be 1 since different objects have different number of vertices"
+
+        if lift2d_dict_path is not None:
+            return self.forward_inference(seg_maps, device, dtype, ds_names, lift2d_dict_path)
+        elif mask_paths_list is not None:
+            return self.forward_train(seg_maps, device, dtype, ds_names, mask_paths_list)
+        else:
+            raise ValueError("Either lift2d_dict_path or mask_paths_list must be provided for ObjectMeshContact3DPredictor")
 
     def _process_view(self, view_seg_map, p2v_map, bary_coord, batch_idx, pred_3d_contacts, view_count):
             device = view_seg_map.device

@@ -32,6 +32,6 @@ password=$(urle $password)
 mkdir -p ./trained_models
 
 # Download and unzip the first two zip files by default
-download_and_unzip 'https://download.is.tue.mpg.de/download.php?domain=tokenhmr&sfile=data.zip' './'
-download_and_unzip 'https://download.is.tue.mpg.de/download.php?domain=tokenhmr&sfile=interactvlm_3d_human_contact.zip' './trained_models'
-download_and_unzip 'https://download.is.tue.mpg.de/download.php?domain=tokenhmr&sfile=interactvlm_3d_object_affordance.zip' './trained_models'
+download_and_unzip 'https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=data.zip' './'
+download_and_unzip 'https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip'
+download_and_unzip 'https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-oafford-lemon-piad.zip'

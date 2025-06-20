@@ -616,21 +616,17 @@ class InteractVLMForCausalLM(LlavaLlamaForCausalLM):
                     uncertainty_map = self.model.visual_model.uncertainty(image_embeddings[i].unsqueeze(0))
                     uncertainty_map = F.interpolate(uncertainty_map, size=original_size_list[i], mode='bilinear', align_corners=False)
                     uncertainty_maps.append(uncertainty_map.squeeze(0))
-
-        
-        if 'oafford' in contact_type and 'HM' in self.oC_sam_view_type:
-            for idx, pred_mask in enumerate(pred_masks):
-                valid_mask = pred_mask != IGNORE_LABEL
-                pred_mask[valid_mask] = pred_mask[valid_mask].sigmoid()
         
         pred_contact_3d = None
 
         if pred_masks[0].shape[0] > 0:
             if self.hC_loss_weight > 0 and 'hcontact' in contact_type:
                 pred_contact_3d = self.human_3d_contact_predictor(pred_masks)
-                # TODO: check if the funnction call is correct
-            elif self.oC_loss_weight > 0 and 'ocontact' in contact_type and 'Mesh' in self.oC_sam_view_type:
-                pred_contact_3d = self.object_3d_contact_predictor(pred_masks, lift2d_dict_path=lift2d_dict_path)
+            # Irrespective of the object contact type trained, during inference object mesh is used, hence object mesh 
+            # predictor is used for object contact prediction
+            elif self.oC_loss_weight > 0 and 'ocontact' in contact_type or 'oafford' in contact_type:
+                ds_names = ['ocontact']
+                pred_contact_3d = self.object_3d_contact_predictor(pred_masks, ds_names=ds_names, lift2d_dict_path=lift2d_dict_path)
 
         result = {
             "output_ids": output_ids,

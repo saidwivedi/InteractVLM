@@ -45,24 +45,108 @@
     By leveraging the rich visual knowledge of large <span style="color:#cc6600; font-weight:bold;">Vision-Language Models</span>, we address the limited availability of ground-truth 3D interaction data for training, resulting in better generalization to diverse real-world interactions.
 </p>
 
-## Code Status
+### Joint Human-Object Reconstruction
+<p align="center">
+  <img src="assets/results/human_object/img1.png" width="22%">
+  <img src="assets/results/human_object/img1_result.gif" width="22%">
+  <img src="assets/results/human_object/img2.png" width="22%">
+  <img src="assets/results/human_object/img2_result.gif" width="22%">
+</p>
 
-- ▣ 3D Human Contact Prediction - Using [DAMON](https://deco.is.tue.mpg.de) and [LEMON](https://yyvhang.github.io/LEMON/) datasets
-   - ▣ Training Code
-   - ▣ Evaluation Code
-   - ▣ Demo Code
-- ▣ 3D Object Affordance Prediction - Using [PIAD](https://yyvhang.github.io/publications/IAG/index.html) dataset
-   - ▣ Training Code
-   - ▣ Evaluation Code
-   - ▣ Demo Code
-- ☐ 3D Object Contact Prediction - Using [PICO](https://pico.is.tue.mpg.de) dataset
-   - ☐ Training, Evaluation and Demo Code
-- ☐ Object Shape Retrieval from Single Image
-- ☐ Optimization code for Joint reconstruction
+### Semantic Human Contact
+<p align="center">
+  <img src="assets/results/human_contact/img1.jpg" width="30%" alt="Input Image">
+  <img src="assets/results/human_contact/img1_bench.gif" width="30%" alt="Contact Prediction">
+  <img src="assets/results/human_contact/img1_bottle.gif" width="30%" alt="Joint Reconstruction">
+</p>
 
-## Installation
+## 🎯 Model Zoo
 
-### Setup Environment
+<div align="center">
+<table style="border-collapse: collapse; margin: 20px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+  <thead>
+    <tr style="background-color: #6c757d; color: #ffffff;">
+      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">#</th>
+      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Model</th>
+      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Type</th>
+      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Training Datasets</th>
+      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Comment</th>
+      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="background-color: #ffffff;">
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-weight: 500;">1</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-family: monospace; background-color: #ffffff; font-weight: bold;">interactvlm-3d-hcontact-damon</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">hcontact</span></td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><a href="https://deco.is.tue.mpg.de" style="color: #0066cc; text-decoration: none;">DAMON</a></td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">Won RHOBIN Human Contact Challenge (CVPR 2025)</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span style="color: #198754; font-weight: 500; font-size: 11px;">✅ Available</span>
+          <a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip" style="background: #6c757d; color: white; padding: 3px 6px; border-radius: 3px; text-decoration: none; font-size: 10px;">Download</a>
+        </div>
+      </td>
+    </tr>
+    <tr style="background-color: #f8f9fa;">
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-weight: 500;">2</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-family: monospace; background-color: #f8f9fa; font-weight: bold;">interactvlm-3d-oafford-lemon-piad</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><span style="background: #f3e5f5; color: #7b1fa2; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">oafford</span></td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><a href="https://yyvhang.github.io/LEMON/" style="color: #0066cc; text-decoration: none;">LEMON-OBJ</a> + <a href="https://yyvhang.github.io/publications/IAG/index.html" style="color: #0066cc; text-decoration: none;">PIAD</a></td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">Estimates Object Affordance</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span style="color: #198754; font-weight: 500; font-size: 11px;">✅ Available</span>
+          <a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-oafford-lemon-piad.zip" style="background: #6c757d; color: white; padding: 3px 6px; border-radius: 3px; text-decoration: none; font-size: 10px;">Download</a>
+        </div>
+      </td>
+    </tr>
+    <tr style="background-color: #ffffff;">
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-weight: 500;">3</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-family: monospace; background-color: #ffffff; font-weight: bold;">interactvlm-joint-reconstruction<sup>#</sup></td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
+        <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+          <span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">hcontact</span>
+          <span style="background: #e8f5e8; color: #2e7d32; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">ocontact</span>
+        </div>
+      </td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
+        <a href="https://deco.is.tue.mpg.de" style="color: #0066cc; text-decoration: none;">DAMON</a> + 
+        <a href="https://yyvhang.github.io/LEMON/" style="color: #0066cc; text-decoration: none;">LEMON-HU</a> + 
+        <a href="https://yyvhang.github.io/LEMON/" style="color: #0066cc; text-decoration: none;">LEMON-OBJ</a> + 
+        <a href="https://yyvhang.github.io/publications/IAG/index.html" style="color: #0066cc; text-decoration: none;">PIAD</a> + 
+        <a href="https://pico.is.tue.mpg.de" style="color: #0066cc; text-decoration: none;">PICO</a>
+      </td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">Single Model for Joint 3D Human Object Contact Estimation</td>
+      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span style="color: #fd7e14; font-weight: 500; font-size: 11px;">🔄 Coming Soon</span>
+          <em style="color: #6c757d; font-size: 10px;">TBA</em>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<sup>#</sup> *The `interactvlm-joint-reconstruction` model will be trained with our new **[PICO Dataset (CVPR 2025)](https://pico.is.tue.mpg.de)**, which enables accurate 3D object contact estimation unlike object affordance using **LEMON-OBJ** and **PIAD** dataset.*
+
+---
+
+## 📋 Code Release Status
+
+### ✅ **Released**
+- **3D Human Contact Estimation** - Training, evaluation, and demo code available
+- **3D Object Contact/Affordance Estimation** - Training, evaluation, and demo code available
+
+### 📅 **Pending**
+- **Object Shape Retrieval from Single Image** - Code release pending
+- **Optimization Pipeline for Joint Reconstruction** - Code release pending
+
+
+## ⚙️ Installation
+
+### 🛠️ Setup Environment
 
 1. **Install Micromamba** (if not already installed):
    ```bash
@@ -94,22 +178,15 @@
    DS_BUILD_FUSED_ADAM=1 pip install deepspeed==0.15.1
    ```
 
-## Data and Model Downloads
-
-### Essential Data Files
-
-To run InteractVLM, you need to download essential data files and pre-trained models. We provide a convenient script to handle this process.
-
-### Download Script Usage
-
-1. **Register for access** at [https://interactvlm.is.tue.mpg.de](https://interactvlm.is.tue.mpg.de) to get your credentials
-
-2. **Run the download script**:
+6. **Setup Environment**:
    ```bash
-   bash fetch_data.sh
+   # Before running demo, training or evaluation scripts, ensure CUDA is properly configured
+   export CUDA_HOME=/usr/local/cuda  # or your CUDA installation path
+   export PATH=$CUDA_HOME/bin:$PATH
+   export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
    ```
 
-## Code Structure
+## 📁 Code Structure
 
 ```
 InteractVLM/
@@ -123,7 +200,7 @@ InteractVLM/
 │   ├── ..
 ├── 📁 scripts/                       # Execution scripts
 │   ├── ..
-├── 📁 data/                          # Dataset folders
+├── 📁 data/                          # Dataset folders, Body models, Demo samples
 │   ├── ..
 ├── 📁 trained_models/                # Trained models
 │   ├── ..
@@ -133,20 +210,51 @@ InteractVLM/
 └── 📄 requirements.txt               # Python dependencies
 ```
 
-## Training and Evaluation
+## 📦 Data and Model Downloads
 
-### Environment Setup
+### 📁 Essential Data Files
 
-Before running training or evaluation scripts, ensure CUDA is properly configured:
+To run InteractVLM, you need to download essential data files and pre-trained models. We provide a convenient script to handle this process.
+
+### 🚀 Download Script Usage
+
+1. **Register for access** at [https://interactvlm.is.tue.mpg.de](https://interactvlm.is.tue.mpg.de) to get your credentials
+
+2. **Run the download script**:
+   ```bash
+   bash fetch_data.sh
+   ```
+
+### 🎮 Demo
+
+Run the demo on your own images with either human or object interaction estimation modes:
 
 ```bash
-# Set CUDA_HOME environment variable (adjust path based on your CUDA installation)
-export CUDA_HOME=/usr/local/cuda  # or your CUDA installation path
-export PATH=$CUDA_HOME/bin:$PATH
-export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+# For 3D human contact estimation
+bash scripts/run_demo.sh hcontact
+
+# For 3D object affordance estimation  
+bash scripts/run_demo.sh oafford
 ```
 
-### Data Generation
+**Demo Requirements:**
+
+- **Human Contact Demo**: The canonical human mesh and rendered input are already provided. Simply run the script to estimate 3D contact points on human bodies.
+
+- **Object Affordance Demo**: The code expects an object mesh as input. The script will automatically render multiple views of the object for affordance prediction.
+
+**Sample Data**: The `data/demo_samples/` directory contains ready-to-use samples for testing both human contact and object affordance estimation. One should get the following results:
+
+<p align="center">
+  <img src="assets/demo_results/tennis_racket__000000041045.png" width="22%" style="border:2px solid #444; padding:2px;">
+  <img src="assets/demo_results/interactvlm-3d-hcontact-damon_tennis_racket__000000041045_hcontact_concat.jpg" width="22%" style="border:2px solid #444; padding:2px;">
+  <img src="assets/demo_results/interactvlm-3d-oafford-lemon-piad_tennis_racket__000000041045_oafford_concat.jpg" width="22%" style="border:2px solid #444; padding:2px;">
+</p>
+
+
+## 🏋️ Training and Evaluation
+
+### 🔧 Data Generation
 
 To generate the data needed for training, run the following script. We will provide the processed datasets soon.
 
@@ -155,14 +263,14 @@ To generate the data needed for training, run the following script. We will prov
 bash scripts/run_datagen.sh
 ```
 
-### Training
+### 🚀 Training
 
 ```bash
 # Run training script with default configuration
 bash scripts/run_train.sh
 ```
 
-### Evaluation
+### 📊 Evaluation
 
 #### **Model Weight Preparation**
 If you have trained a new model, prepare the weights for evaluation:
@@ -178,34 +286,7 @@ bash scripts/run_prepare_weights.sh 0
 bash scripts/run_eval.sh
 ```
 
-### Demo
-
-Run the interactive demo on your own images:
-
-```bash
-# Run demo script
-bash scripts/run_demo.sh
-```
-
-## Results
-
-### Joint Human-Object Reconstruction
-<p align="center">
-  <img src="assets/results/human_object/img1.png" width="22%">
-  <img src="assets/results/human_object/img1_result.gif" width="22%">
-  <img src="assets/results/human_object/img2.png" width="22%">
-  <img src="assets/results/human_object/img2_result.gif" width="22%">
-</p>
-
-### Semantic Human Contact
-<p align="center">
-  <img src="assets/results/human_contact/img1.jpg" width="30%" alt="Input Image">
-  <img src="assets/results/human_contact/img1_bench.gif" width="30%" alt="Contact Prediction">
-  <img src="assets/results/human_contact/img1_bottle.gif" width="30%" alt="Joint Reconstruction">
-</p>
-
-
-## Acknowledgements
+## 🙏 Acknowledgements
 
 We thank
 <a href="https://is.mpg.de/person/acseke">Alpár Cseke</a> 
@@ -223,7 +304,7 @@ for IT support.
 SKD is supported by the International Max Planck Research School for Intelligent Systems (IMPRS-IS). 
 The UvA part of the team is supported by an ERC Starting Grant (STRIPES, 101165317, PI: D. Tzionas).
 
-## Citation
+## 📝 Citation
 If you find this code useful for your research, please consider citing the following paper:
 
 ```bibtex
@@ -235,11 +316,11 @@ If you find this code useful for your research, please consider citing the follo
     year      = {2025},
 }
 ```
-## License
+## ⚖️ License
 
 This code is available for **non-commercial scientific research purposes** as defined in the [LICENSE file](LICENSE). By downloading and using this code you agree to the terms in the [LICENSE](LICENSE). Third-party datasets and software are subject to their respective licenses.
 
-## Contact
+## 📧 Contact
 
 For code related questions, please contact sai.dwivedi@tuebingen.mpg.de
 

@@ -19,6 +19,11 @@ from model.segment_anything.utils.transforms import ResizeLongestSide
 from utils.utils import (DEFAULT_IM_END_TOKEN, DEFAULT_IM_START_TOKEN,
                          DEFAULT_IMAGE_TOKEN, IMAGE_TOKEN_INDEX)
 from utils.utils import convert_contacts
+from utils.demo_utils import (
+    generate_sam_inp_objs,
+    process_smplx_mesh_with_contacts,
+    process_object_mesh_with_contacts,
+)
 from datasets.base_contact_dataset import normalize_cam_params
 from preprocess_data.constants import HUMAN_VIEW_DICT, OBJS_VIEW_DICT, SMPL_TO_SMPLX_MAPPING
 
@@ -187,6 +192,17 @@ def main(args):
                 object_name = llava_image_path.split('/')[-1].split('__')[0].lower()
                 prompts.append(base_prompt.format(class_name=object_name))
                 sam_base_folder = os.path.dirname(llava_image_path) + '/sam_inp_objs'
+                
+                # Check if sam_inp_objs folder exists, if not generate it  
+                if not os.path.exists(sam_base_folder):
+                    obj_mesh_path = os.path.join(os.path.dirname(llava_image_path), 'object_mesh.obj')
+                    if os.path.exists(obj_mesh_path):
+                        print(f'sam_inp_objs not found, generating for {os.path.dirname(llava_image_path)}')
+                        generate_sam_inp_objs(obj_mesh_path)
+                    else:
+                        print(f'Warning: object_mesh.obj not found at {obj_mesh_path}, cannot generate sam_inp_objs')
+                        continue
+                
                 tmp_sam_paths, tmp_overlay_sam_paths = [], []
                 for view in view_names:
                     tmp_sam_paths.append(f'{sam_base_folder}/obj_render_color_{view}.png')
@@ -310,8 +326,30 @@ def main(args):
             pred_contact_3d_smplx = convert_contacts(pred_contact_3d, smpl_to_smlpx_mapping)
             np.savez(f'{os.path.dirname(llava_image_path)}/hcontact_vertices.npz', \
                     pred_contact_3d_smplh=pred_contact_3d.cpu(), pred_contact_3d_smplx=pred_contact_3d_smplx.cpu())
+            
+            # Process SMPLX mesh with contact vertices
+            output_smplx_path = os.path.join(args.vis_save_path, f'smplx_body_with_hcontacts.obj')
+            process_smplx_mesh_with_contacts(
+                pred_contact_3d_smplx, 
+                output_smplx_path,
+                contact_threshold=0.3,
+                gender='neutral'
+            )
         else:
             np.savez(f'{os.path.dirname(llava_image_path)}/oafford_vertices.npz', pred_contact_3d=pred_contact_3d.cpu())
+            
+            # Process object mesh with contact vertices for ocontact/oafford
+            obj_mesh_path = os.path.join(os.path.dirname(llava_image_path), 'object_mesh.obj')
+            if os.path.exists(obj_mesh_path):
+                output_obj_path = os.path.join(args.vis_save_path, f'object_mesh_with_contacts_{args.contact_type}.obj')
+                process_object_mesh_with_contacts(
+                    obj_mesh_path, 
+                    pred_contact_3d[0], 
+                    output_obj_path,
+                    contact_threshold=0.5
+                )
+            else:
+                print(f'Warning: object_mesh.obj not found at {obj_mesh_path}')
         
         # Decode the output text
         output_ids = output_ids[0][output_ids[0] != IMAGE_TOKEN_INDEX]
@@ -348,18 +386,7 @@ def main(args):
             
             # Store the overlay image
             overlay_images.append(overlay_sam)
-
-            save_path = "{}/{}_mask_{}.jpg".format(
-                args.vis_save_path, llava_image_path.split("/")[-1].split(".")[0], view_names[i]
-            )
-            cv2.imwrite(save_path, pred_mask_3d * 255)
             
-            # Also save individual images if needed
-            # save_path = "{}/{}_overlay_sam_{}.jpg".format(
-            #     args.vis_save_path, llava_image_path.split("/")[-1].split(".")[0], view_names[i]
-            # )
-            # cv2.imwrite(save_path, overlay_sam)
-
         # Create 2x2 grid
         h, w = overlay_images[0].shape[:2]
         grid = np.zeros((h*2, w*2, 3), dtype=np.uint8)
