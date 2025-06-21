@@ -3,7 +3,7 @@
 export PATH=$PATH
 export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
 export HF_HOME='.cache/huggingface'
-# export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
+export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
 
 
 # Check if user provided the contact type

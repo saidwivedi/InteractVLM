@@ -3,19 +3,13 @@
 # Set environment variables
 export PATH=$PATH
 export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
-export LD_LIBRARY_PATH=/is/software/nvidia/cuda-11.8/lib64:$LD_LIBRARY_PATH
-export PATH=/is/software/nvidia/cuda-11.8/bin:$PATH
-export CUDA_HOME=/is/software/nvidia/cuda-11.8
-export C_INCLUDE_PATH=/is/software/nvidia/cudnn-8.7.0-cu11.x/include
-export CPLUS_INCLUDE_PATH=$C_INCLUDE_PATH
-export LD_LIBRARY_PATH=/is/software/nvidia/cudnn-8.7.0-cu11.x/lib64:$LD_LIBRARY_PATH
+export HF_HOME='.cache/huggingface'
 export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
-export TORCH_CUDA_ARCH_LIST="8.0;9.0"
-export HOME='/home/sdwivedi'
+
 
 # generate random number between 20000 and 25000
 MASTER_PORT=$(( ( RANDOM % 5000 )  + 20000 ))
-VISION_PRETRAINED="../pretrained_models/sam_vit_h_4b8939.pth"
+VISION_PRETRAINED="./data/sam_vit_h_4b8939.pth"
 
 
 EPOCHS='30'
@@ -36,9 +30,9 @@ NO_EVAL="False"
 
 LORA_R="8"
 
-OAFFORD_SEG_DATA="piad_oafford"
+OAFFORD_SEG_DATA="piad_oafford||lemon_oafford"
 OCONTACT_SEG_DATA="pico_ocontact"
-HCONTACT_SEG_DATA="lemon_hcontact"
+HCONTACT_SEG_DATA="damon_hcontact||lemon_hcontact"
 VQA_DATA="llava"
 VAL_DATASET="piad_oafford"
 
@@ -52,12 +46,12 @@ OC_QUESTION_TYPE="afford_obj"
 HC_QUESTION_TYPE="parts"
 HC_TRAIN_FRACTION="1.0"
 
-HC_LOSS_WEIGHT="3.0"
-OC_LOSS_WEIGHT="5.0"
-BCE_LOSS_WEIGHT="2.0"
-BCE_LOSS_ALPHA="0.25"
-DICE_LOSS_SCALE="1000"
-DICE_LOSS_WEIGHT="0.5"
+HC_LOSS_WEIGHT="0.0"
+OC_LOSS_WEIGHT="0.0"
+BCE_LOSS_WEIGHT="0.0"
+BCE_LOSS_ALPHA="0.0"
+DICE_LOSS_SCALE="1"
+DICE_LOSS_WEIGHT="0.0"
 
 VERSION="xinlai/LISA-13B-llama2-v1"
 CLIP_MODEL="openai/clip-vit-large-patch14"
@@ -74,31 +68,51 @@ DATASET_DIR="./data"
 # Function to set configuration based on numerical argument
 set_configuration() {
   case $1 in
-    0)
-      EXP_NAME="DAMON_LLaVA-13B"
+    "hcontact-damon")
+      EXP_NAME="interactvlm-3d-hcontact-damon"
       DATASET="hcontact_seg"
       SAMPLE_RATES="1"
-      OC_SAM_VIEW_TYPE="4MV-Z_HM"
-      OC_SAM_INPUT_TYPE="color"
-      OC_RANKING="lookup"
       HC_SAM_INPUT_TYPE="norm"
       HC_SAM_VIEW_TYPE="4MV-Z_Vitru"
       HC_MASK_TYPE="objectwise"
-      OC_QUESTION_TYPE="afford"
       HC_QUESTION_TYPE="parts"
       HC_TRAIN_FRACTION="1.0"
       BATCH_SIZE="8"
       GRAD_ACCUMULATION_STEPS="1"
-      OAFFORD_SEG_DATA="lemon_oafford"
       HCONTACT_SEG_DATA="damon_hcontact"
-      VQA_DATA="llava||lemon"
       VAL_DATASET="damon_hcontact"
       USE_FEAT_FUSION="False"
       USE_UNCERTAINTY="False"
       MULTIVIEW_CAM_COND="True"
       CAM_ENCODER_TYPE="vi_v1"
       HC_LOSS_WEIGHT="3.0"
-      OC_LOSS_WEIGHT="0.0"
+      BCE_LOSS_WEIGHT="2.0"
+      BCE_LOSS_ALPHA="0.5"
+      DICE_LOSS_SCALE="1.0"
+      DICE_LOSS_WEIGHT="1.0"
+      TOKEN_TYPE="Gen"
+      TRAIN_FROM_LISA="True"
+      TRAIN_FROM_LLAVA="False"
+      IMG_EMB_LEN="255"
+      LOG_WANDB="True"
+      ;;
+    "oafford-lemon-piad")
+      EXP_NAME="interactvlm-3d-oafford-lemon-piad"
+      DATASET="offord_seg"
+      SAMPLE_RATES="1"
+      OC_SAM_VIEW_TYPE="4MV-Z_HM"
+      OC_SAM_INPUT_TYPE="color"
+      OC_RANKING="lookup"
+      OC_QUESTION_TYPE="afford"
+      BATCH_SIZE="8"
+      GRAD_ACCUMULATION_STEPS="1"
+      OAFFORD_SEG_DATA="piad_oafford||lemon_oafford"
+      VAL_DATASET="piad_oafford"
+      USE_FEAT_FUSION="False"
+      USE_UNCERTAINTY="False"
+      MULTIVIEW_CAM_COND="True"
+      CAM_ENCODER_TYPE="vi_v1"
+      OC_LOSS_WEIGHT="3.0"
       BCE_LOSS_WEIGHT="2.0"
       BCE_LOSS_ALPHA="0.5"
       DICE_LOSS_SCALE="1.0"
@@ -127,7 +141,7 @@ set_configuration $1
 
 
 # Run the DeepSpeed training
-echo "/is/cluster/fast/sdwivedi/micromamba/envs/interactvlm/bin/deepspeed \
+echo "deepspeed \
   --master_port=$MASTER_PORT train.py \
   --version=$VERSION \
   --vision_pretrained=$VISION_PRETRAINED \
@@ -176,7 +190,7 @@ echo "/is/cluster/fast/sdwivedi/micromamba/envs/interactvlm/bin/deepspeed \
   --cam_encoder_type=$CAM_ENCODER_TYPE"
 
 
-/is/cluster/fast/sdwivedi/micromamba/envs/interactvlm/bin/deepspeed \
+deepspeed \
   --master_port=$MASTER_PORT train.py \
   --version=$VERSION \
   --vision_pretrained=$VISION_PRETRAINED \

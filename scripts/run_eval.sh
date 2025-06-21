@@ -3,15 +3,9 @@
 # Set environment variables
 export PATH=$PATH
 export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
-export LD_LIBRARY_PATH=/is/software/nvidia/cuda-11.8/lib64:$LD_LIBRARY_PATH
-export PATH=/is/software/nvidia/cuda-11.8/bin:$PATH
-export CUDA_HOME=/is/software/nvidia/cuda-11.8
-export C_INCLUDE_PATH=/is/software/nvidia/cudnn-8.7.0-cu11.x/include
-export CPLUS_INCLUDE_PATH=$C_INCLUDE_PATH
-export LD_LIBRARY_PATH=/is/software/nvidia/cudnn-8.7.0-cu11.x/lib64:$LD_LIBRARY_PATH
-export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
-export TORCH_CUDA_ARCH_LIST="8.0;9.0"
-export HOME='/home/sdwivedi'
+export HF_HOME='.cache/huggingface'
+# export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
+
 
 # generate random number between 20000 and 25000
 MASTER_PORT=$(( ( RANDOM % 5000 )  + 20000 ))
@@ -54,7 +48,7 @@ fi
 set_configuration $1
 
 
-/is/cluster/fast/sdwivedi/micromamba/envs/interactvlm/bin/deepspeed \
+deepspeed \
   --master_port=$MASTER_PORT evaluate.py \
   --version=$VERSION \
   --log_wandb=$LOG_WANDB \

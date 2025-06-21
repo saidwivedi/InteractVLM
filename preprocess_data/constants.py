@@ -1,6 +1,6 @@
 import numpy as np
 
-SMPL_TO_SMPLX_MAPPING = '/ps/scratch/ps_shared/stripathi/deco++/alpar/essentials/models_utils/smpl_to_smplx.pkl'
+SMPL_TO_SMPLX_MAPPING = './data/smpl_to_smplx.pkl'
 
 AFFORD_LIST_PIAD = np.array(['grasp', 'contain', 'lift', 'open', 'lay', 'sit', 'support', 'wrapgrasp', 'pour', 
                              'move', 'display', 'push', 'listen', 'wear', 'press', 'cut', 'stab'])

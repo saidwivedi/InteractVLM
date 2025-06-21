@@ -67,14 +67,14 @@ def parse_args(args):
     )
     parser.add_argument("--vqa_data", default="llava||damon", type=str)
     parser.add_argument("--reason_seg_data", default="ReasonSeg|train", type=str)
-    parser.add_argument("--oafford_seg_data", default="piad_oafford", type=str)
+    parser.add_argument("--oafford_seg_data", default="piad_oafford||lemon_oafford", type=str)
     parser.add_argument("--ocontact_seg_data", default="pico_ocontact", type=str)
-    parser.add_argument("--hcontact_seg_data", default="lemon_hcontact", type=str)
+    parser.add_argument("--hcontact_seg_data", default="damon_hcontact||lemon_hcontact", type=str)
     parser.add_argument("--h2dcontact_seg_data", default="damon_h2dcontact", type=str)
-    parser.add_argument("--val_dataset", default="piad_oafford", type=str)
+    parser.add_argument("--val_dataset", default="damon_hcontact", type=str)
     parser.add_argument("--dataset_dir", default="./data", type=str)
     parser.add_argument("--log_base_dir", default="./runs", type=str)
-    parser.add_argument("--exp_name", default="lisa", type=str)
+    parser.add_argument("--exp_name", default="interactvlm", type=str)
     parser.add_argument("--epochs", default=10, type=int)
     parser.add_argument("--steps_per_epoch", default=500, type=int)
     parser.add_argument(
@@ -192,7 +192,7 @@ def main(args):
         writer = SummaryWriter(args.log_dir)
         loggers[0] = writer
         if args.log_wandb:
-            wandb_logger = wandb.init(project="CHARM",
+            wandb_logger = wandb.init(project="interactvlm",
                                     name=args.exp_name, 
                                     dir=args.log_dir,
                                     config=vars(args))

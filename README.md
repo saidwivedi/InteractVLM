@@ -63,66 +63,66 @@
 ## 🎯 Model Zoo
 
 <div align="center">
-<table style="border-collapse: collapse; margin: 20px auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+<table>
   <thead>
-    <tr style="background-color: #6c757d; color: #ffffff;">
-      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">#</th>
-      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Model</th>
-      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Type</th>
-      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Training Datasets</th>
-      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Comment</th>
-      <th style="padding: 12px 12px; text-align: center; font-weight: bold; border: 1px solid #e9ecef;">Status</th>
+    <tr>
+      <th>#</th>
+      <th>Model</th>
+      <th>Type</th>
+      <th>Training Datasets</th>
+      <th>Comment</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody>
-    <tr style="background-color: #ffffff;">
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-weight: 500;">1</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-family: monospace; background-color: #ffffff; font-weight: bold;">interactvlm-3d-hcontact-damon</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">hcontact</span></td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><a href="https://deco.is.tue.mpg.de" style="color: #0066cc; text-decoration: none;">DAMON</a></td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">Won RHOBIN Human Contact Challenge (CVPR 2025)</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-          <span style="color: #198754; font-weight: 500; font-size: 11px;">✅ Available</span>
-          <a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip" style="background: #6c757d; color: white; padding: 3px 6px; border-radius: 3px; text-decoration: none; font-size: 10px;">Download</a>
-        </div>
+    <tr>
+      <td>1</td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip"><code>interactvlm-3d-hcontact-damon</code></a></td>
+      <td><img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"></td>
+      <td><sub><a href="https://deco.is.tue.mpg.de">DAMON</a></sub></td>
+      <td>Won RHOBIN Human Contact Challenge (CVPR 2025)</td>
+      <td>
+        <img src="https://img.shields.io/badge/✅_Available-green" alt="Available">
       </td>
     </tr>
-    <tr style="background-color: #f8f9fa;">
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-weight: 500;">2</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-family: monospace; background-color: #f8f9fa; font-weight: bold;">interactvlm-3d-oafford-lemon-piad</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><span style="background: #f3e5f5; color: #7b1fa2; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">oafford</span></td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;"><a href="https://yyvhang.github.io/LEMON/" style="color: #0066cc; text-decoration: none;">LEMON-OBJ</a> + <a href="https://yyvhang.github.io/publications/IAG/index.html" style="color: #0066cc; text-decoration: none;">PIAD</a></td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">Estimates Object Affordance</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-          <span style="color: #198754; font-weight: 500; font-size: 11px;">✅ Available</span>
-          <a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-oafford-lemon-piad.zip" style="background: #6c757d; color: white; padding: 3px 6px; border-radius: 3px; text-decoration: none; font-size: 10px;">Download</a>
-        </div>
+    <tr>
+      <td>2</td>
+      <td><code>interactvlm-3d-hcontact-damon-lemon</code></td>
+      <td><img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"></td>
+      <td><sub><a href="https://deco.is.tue.mpg.de">DAMON</a> + <a href="https://yyvhang.github.io/LEMON/">LEMON-HU</a></sub></td>
+      <td>Best in-the-wild 3D Human Contact Estimation (with foot ground contact)</td>
+      <td>
+        <img src="https://img.shields.io/badge/🔄_Coming_Soon-orange" alt="Coming Soon">
       </td>
     </tr>
-    <tr style="background-color: #ffffff;">
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-weight: 500;">3</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef; font-family: monospace; background-color: #ffffff; font-weight: bold;">interactvlm-joint-reconstruction<sup>#</sup></td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
-        <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
-          <span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">hcontact</span>
-          <span style="background: #e8f5e8; color: #2e7d32; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500;">ocontact</span>
-        </div>
+    <tr>
+      <td>3</td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-oafford-lemon-piad.zip"><code>interactvlm-3d-oafford-lemon-piad</code></a></td>
+      <td><img src="https://img.shields.io/badge/oafford-purple" alt="oafford"></td>
+      <td><sub><a href="https://yyvhang.github.io/LEMON/">LEMON-OBJ</a> + <a href="https://yyvhang.github.io/publications/IAG/index.html">PIAD</a></sub></td>
+      <td>Estimates Object Affordance</td>
+      <td>
+        <img src="https://img.shields.io/badge/✅_Available-green" alt="Available">
       </td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
-        <a href="https://deco.is.tue.mpg.de" style="color: #0066cc; text-decoration: none;">DAMON</a> + 
-        <a href="https://yyvhang.github.io/LEMON/" style="color: #0066cc; text-decoration: none;">LEMON-HU</a> + 
-        <a href="https://yyvhang.github.io/LEMON/" style="color: #0066cc; text-decoration: none;">LEMON-OBJ</a> + 
-        <a href="https://yyvhang.github.io/publications/IAG/index.html" style="color: #0066cc; text-decoration: none;">PIAD</a> + 
-        <a href="https://pico.is.tue.mpg.de" style="color: #0066cc; text-decoration: none;">PICO</a>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><code>interactvlm-joint-reconstruction</code><sup>#</sup></td>
+      <td>
+        <img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"> <img src="https://img.shields.io/badge/ocontact-yellow" alt="ocontact">
       </td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">Single Model for Joint 3D Human Object Contact Estimation</td>
-      <td style="padding: 10px 12px; text-align: center; border: 1px solid #e9ecef;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-          <span style="color: #fd7e14; font-weight: 500; font-size: 11px;">🔄 Coming Soon</span>
-          <em style="color: #6c757d; font-size: 10px;">TBA</em>
-        </div>
+      <td>
+        <sub>
+        <a href="https://deco.is.tue.mpg.de">DAMON</a> + 
+        <a href="https://yyvhang.github.io/LEMON/">LEMON-HU</a> + 
+        <a href="https://yyvhang.github.io/LEMON/">LEMON-OBJ</a> + 
+        <a href="https://yyvhang.github.io/publications/IAG/index.html">PIAD</a> + 
+        <a href="https://pico.is.tue.mpg.de">PICO</a>
+        </sub>
+      </td>
+      <td>Single Model for Joint 3D Human Object Contact Estimation</td>
+      <td>
+        <img src="https://img.shields.io/badge/🔄_Coming_Soon-orange" alt="Coming Soon">
       </td>
     </tr>
   </tbody>
@@ -218,7 +218,7 @@ To run InteractVLM, you need to download essential data files and pre-trained mo
 
 ### 🚀 Download Script Usage
 
-1. **Register for access** at [https://interactvlm.is.tue.mpg.de](https://interactvlm.is.tue.mpg.de) to get your credentials
+1. **Register for access** at [https://interactvlm.is.tue.mpg.de/login.php](https://interactvlm.is.tue.mpg.de/login.php) to get your credentials
 
 2. **Run the download script**:
    ```bash
@@ -256,7 +256,7 @@ bash scripts/run_demo.sh oafford
 
 ### 🔧 Data Generation
 
-To generate the data needed for training, run the following script. We will provide the processed datasets soon.
+To generate the data needed for training, run the following script. For now, we provide preprocessed dataset for DAMON. We will soon release for LEMON, PIAD and PICO.
 
 ```bash
 # Generate preprocessed data
@@ -265,9 +265,14 @@ bash scripts/run_datagen.sh
 
 ### 🚀 Training
 
+To train 3D Human Contact Estimation using DAMON dataset, download the preprocessed dataset using the following command and place it under `data/damon`. Then run the training script.
+
 ```bash
-# Run training script with default configuration
-bash scripts/run_train.sh
+# Download preprocessed DAMON dataset
+bash fetch_data.sh damon-dataset
+
+# Train human contact with DAMON dataset
+bash scripts/run_train.sh hcontact-damon
 ```
 
 ### 📊 Evaluation
@@ -303,6 +308,23 @@ for their valuable feedback and
 for IT support.
 SKD is supported by the International Max Planck Research School for Intelligent Systems (IMPRS-IS). 
 The UvA part of the team is supported by an ERC Starting Grant (STRIPES, 101165317, PI: D. Tzionas).
+
+### Code and Datasets
+InteractVLM builds upon several excellent open-source projects and datasets:
+
+- **[LISA](https://github.com/dvlab-research/LISA)** - InteractVLM is built on top of this foundational framework
+- **[LEMON](https://yyvhang.github.io/LEMON/)**, **[DECO](https://deco.is.tue.mpg.de)**, and **[PIAD](https://github.com/yyvhang/IAGNet)** - For human contact and object affordance data
+- **[Blendify](https://github.com/ptrvilya/blendify/)** - For rendering
+
+### Optimization Pipeline
+Our optimization pipeline integrates the following repositories:
+
+- **[OpenShape](https://github.com/Colin97/OpenShape_code)** - For object shape retrieval
+- **[OSX](https://github.com/IDEA-Research/OSX)** - For SMPLX human pose estimation  
+- **[Grounded-SAM](https://github.com/IDEA-Research/Grounded-Segment-Anything)** - For object detection and segmentation
+- **[Depth Pro](https://github.com/apple/ml-depth-pro)** - For depth estimation
+
+
 
 ## 📝 Citation
 If you find this code useful for your research, please consider citing the following paper:

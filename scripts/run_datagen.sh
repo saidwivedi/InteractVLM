@@ -19,11 +19,11 @@ output_dir="rendered_points_heatmap_1102_color"
 data_type="unseen"
 split="Test"
 # Run the Python program with the selected parameters
-${env_root}envs/sdfusion/bin/python ${root_dir}/preprocess_data/generate_piad_obj_heatmap.py \
-                                                                          --split "$split" \
-                                                                          --run_id "$number" \
-                                                                          --data_type "$data_type" \
-                                                                          --output_dir "$output_dir"
+python ${root_dir}/preprocess_data/generate_piad_obj_heatmap.py \
+                                                --split "$split" \
+                                                --run_id "$number" \
+                                                --data_type "$data_type" \
+                                                --output_dir "$output_dir"
 
 ##################################### LEMON OBJECT MASK ########################################
 
@@ -50,10 +50,10 @@ view_type=${view_types[$i]}
 
 output_dir="rendered_points_heatmap_1030_color"
 # Run the Python program with the selected parameters
-${env_root}envs/sdfusion/bin/python ${root_dir}/preprocess_data/generate_lemon_obj_heatmap.py \
-                                                                          --split "$split" \
-                                                                          --view_type "$view_type" \
-                                                                          --output_dir "$output_dir"
+python ${root_dir}/preprocess_data/generate_lemon_obj_heatmap.py \
+                                                --split "$split" \
+                                                --view_type "$view_type" \
+                                                --output_dir "$output_dir"
 
 #################################### LEMON HUMAN MASK ########################################
 # Define the possible combinations
@@ -73,10 +73,10 @@ esac
 view_type="views4"
 output_dir="hcontact_vitruvian"
 
-${env_root}envs/sdfusion/bin/python ${root_dir}/preprocess_data/generate_lemon_human_mask.py \
-                                                                          --split "$split" \
-                                                                          --output_dir "$output_dir" \
-                                                                          --view_type "$view_type"
+python ${root_dir}/preprocess_data/generate_lemon_human_mask.py \
+                                                  --split "$split" \
+                                                  --output_dir "$output_dir" \
+                                                  --view_type "$view_type"
 
 #################################### DAMON HUMAN MASK ########################################
 
@@ -106,8 +106,8 @@ esac
 view_type="views4"
 output_dir="hcontact_vitruvian"
 
-${env_root}envs/sdfusion/bin/python ${root_dir}/preprocess_data/generate_damon_human_mask.py \
-                                                                          --split "$split" \
-                                                                          --mask_type "$mask_type" \
-                                                                          --output_dir "$output_dir" \
-                                                                          --view_type "$view_type"
+python ${root_dir}/preprocess_data/generate_damon_human_mask.py \
+                                                  --split "$split" \
+                                                  --mask_type "$mask_type" \
+                                                  --output_dir "$output_dir" \
+                                                  --view_type "$view_type"
