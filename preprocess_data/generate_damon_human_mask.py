@@ -94,6 +94,21 @@ def get_body_parts_from_vertices(vertices_list, threshold=0.1):
             
     return body_parts
 
+def get_contact_subset(contact_vertices, body_parts, threshold=0.1):
+    """
+    Get a subset of contact vertices that belong to the specified body parts.
+    """
+    contact_subset = []
+    
+    for part in body_parts:
+        part_vertices = MERGED_SEGM[part]
+        intersection = set(contact_vertices).intersection(set(part_vertices))
+        
+        if len(intersection) / len(part_vertices) >= threshold:
+            contact_subset.extend(intersection)
+    
+    return list(set(contact_subset))  # Return unique vertices only
+
 def generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=False):
     mask_list, render_list, pixel_to_vertices_map_list, bary_coords_list = [], [], [], []
 
@@ -105,12 +120,11 @@ def generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, de
         mask, pixel_to_vertices_map, bary_coords = project_vertices_and_create_mask(
             mesh, camera_params, contact_vertices, image_size=RENDER_IMG_SIZE)
         
-        ### no need to render for all images -- fixed for all images ###
-        render = render_mesh(mesh, camera_params, LIGHT_LOCATIONS[idx], image_size=RENDER_IMG_SIZE)
-
         cv2.imwrite(save_path, mask)
         
         if debug:
+            ### no need to render for all images -- fixed for all images ###
+            render = render_mesh(mesh, camera_params, LIGHT_LOCATIONS[idx], image_size=RENDER_IMG_SIZE)
             np.savez_compressed(f'{out_dir}/v2pmap_{imgname[:-4]}_{save_str}.npz', 
                             pixel_to_vertices_map=pixel_to_vertices_map, 
                             bary_coords=bary_coords)
@@ -159,9 +173,11 @@ if __name__ == '__main__':
     missing_contact = {} 
     total_valid_annotations = 0
     body_parts_name = {}
+    new_damon_contact_obj = []
 
     for idx, img_f in enumerate(damon_list):
 
+        # print(f'Processing {idx}/{len(damon_list)}: {img_f}')
         imgname = os.path.basename(img_f)
         root_folder = eval(f'DAMON_{args.split.upper()}_IMG_ROOT')
         img_f = f'{root_folder}/{imgname}'
@@ -170,11 +186,13 @@ if __name__ == '__main__':
 
         body = body_model(body_pose=VIRTUVIAN_POSE)
         vertices = body.vertices[0].detach()
+        new_damon_contact_obj.append({})
         
         # create mask for each object
         if args.mask_type == 'objectwise':
             for obj in list(damon_contact_obj[idx].keys()):
                 contact_vertices = damon_contact_obj[idx][obj]
+                new_damon_contact_obj[idx][obj] = contact_vertices
                 out_dir = f'{DAMON_DATA_ROOT}/{args.split}/{args.output_dir}/{obj}'
                 if len(contact_vertices) == 0:
                     if obj not in missing_contact.keys():
@@ -189,6 +207,19 @@ if __name__ == '__main__':
                 print(f'processing {idx}/{len(damon_list)} {imgname} | Contact vertices: {len(contact_vertices)} \nMissing: {missing_contact}')
                 # rgb_img.save(f'{out_dir}/{imgname}')
                 generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=debug)
+
+                # Since DAMON does not have foot ground contact vertices, we create a separate mask for foot ground
+                if 'supporting' in obj:
+                    out_dir = f'{DAMON_DATA_ROOT}/{args.split}/{args.output_dir}/foot_ground'
+                    if len(contact_vertices) != 0:
+                        contact_vertices_subset = get_contact_subset(contact_vertices, ['left foot', 'right foot'])
+                        if len(contact_vertices_subset) != 0:
+                            new_damon_contact_obj[idx][f'foot_ground'] = contact_vertices_subset
+                            body_parts_name[f'{imgname[:-4]}_foot_ground'] = part_names
+                            os.makedirs(out_dir, exist_ok=True)
+                            print(f'processing {idx}/{len(damon_list)} {imgname} with foot ground | Contact vertices: {len(contact_vertices_subset)}')
+                            # rgb_img.save(f'{out_dir}/{imgname}')
+                            generate_human_mask(imgname, mesh, contact_vertices_subset, out_dir, views_dict, debug=debug)
 
         # create mask for all contact vertices
         else:
@@ -210,10 +241,10 @@ if __name__ == '__main__':
 
         total_valid_annotations += 1
 
-    jl.dump(body_parts_name, f'{DAMON_DATA_ROOT}/{args.split}/body_parts_{args.mask_type}.pkl')
+    jl.dump(body_parts_name, f'{DAMON_DATA_ROOT}/{args.split}/body_parts_{args.mask_type}_wFootGround.pkl')
+    jl.dump(new_damon_contact_obj, f'{DAMON_DATA_ROOT}/{args.split}/contact_label_{args.mask_type}_wFootGround.pkl')
     
     print(f'Total valid annotations: {total_valid_annotations}/{len(damon_list)}')
-
 
 
         

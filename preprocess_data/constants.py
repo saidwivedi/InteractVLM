@@ -338,40 +338,17 @@ OBJS_VIEW_DICT = {
                 },
 }
 
-HUMAN_VIEW_DICT = {
-    '4MV-XY_Fix': {'order': 'fix',
-                  'num_vertices': 6890,
-                  'grid_size': np.array([1, 2, 2]),
-                  'mask_size': 512,
-                  'folder': 'hcontact_4view_unPosed',
-                  'pixel_to_vertex': 'pixel_to_vertex_map_512.npz',
-                  'bary_coords': 'bary_coords_map_512.npz',
-                  'names': np.array([[['topfront', 'bottomfront'],
-                                    ['topback', 'bottomback']]]),
-                  'ignore_keywords': [],
-                  'cam_params': {'topfront': None, 'bottomfront': None, 'topback': None, 'bottomback': None}
-                },
-
-    '4MV-XY_Vitru': {'order': 'fix',
-                    'num_vertices': 6890,
-                    'grid_size': np.array([1, 2, 2]),
-                    'mask_size': 1024,
-                    'folder': 'hcontact_vitruvian',
-                    'pixel_to_vertex': 'pixel_to_vertex_map_1024.npz',
-                    'bary_coords': 'bary_coords_map_1024.npz',
-                    'names': np.array([[['topfront', 'bottomfront'],
-                                       ['topback', 'bottomback']]]),
-                    'ignore_keywords': [],
-                    'cam_params': {'topfront': None, 'bottomfront': None, 'topback': None, 'bottomback': None}
-                },
-    
-    '4MV-Z_Vitru': {'order': 'fix',
+HUMAN_VIEW_DICT = { 
+    '4MV-Z_Vitru': 
+                    {'order': 'fix',
                     'num_vertices': 6890,
                     'grid_size': np.array([4, 1, 1]),
                     'mask_size': 1024,
                     'folder': 'hcontact_vitruvian',
                     'pixel_to_vertex': 'pixel_to_vertex_map_1024.npz',
                     'bary_coords': 'bary_coords_map_1024.npz',
+                    'contact_annot_f': 'contact_label_objectwise.pkl',
+                    'body_parts_annot_f': 'body_parts_objectwise.pkl',
                     'names': np.array([[['topfront']],
                                        [['bottomfront']],
                                        [['topback']],
@@ -383,27 +360,29 @@ HUMAN_VIEW_DICT = {
                         'topback':     [2., 45., 135., 0., 0.],
                         'bottomback':  [2., 315., 135, 0., 0.3]
                     }
-                },
-    
-    '4MV-Z_DAMON': {'order': 'fix',
+                }, 
+    '4MV-Z_Vitru_FootGround':
+                    {'order': 'fix',
                     'num_vertices': 6890,
                     'grid_size': np.array([4, 1, 1]),
                     'mask_size': 1024,
                     'folder': 'hcontact_vitruvian',
                     'pixel_to_vertex': 'pixel_to_vertex_map_1024.npz',
                     'bary_coords': 'bary_coords_map_1024.npz',
+                    'contact_annot_f': 'contact_label_objectwise_wFootGround.pkl',
+                    'body_parts_annot_f': 'body_parts_objectwise_wFootGround.pkl',
                     'names': np.array([[['topfront']],
-                                        [['bottomfront']],
-                                        [['topback']],
-                                        [['bottomback']]]),
-                    'ignore_keywords': ['supporting', 'car', 'tv', 'traffic_light', 'truck', 'stop_sign', 'train', 'airplane', 'bus'],
+                                       [['bottomfront']],
+                                       [['topback']],
+                                       [['bottomback']]]),
+                    'ignore_keywords': [],
                     'cam_params': {
                         'topfront':    [2., 45., 315., 0., 0.],
                         'bottomfront': [2., 315., 315., 0., 0.3],
                         'topback':     [2., 45., 135., 0., 0.],
                         'bottomback':  [2., 315., 135, 0., 0.3]
                     }
-                },
+                }, 
 }
 
 VALID_OBJ_NAMES_PIAD = list(AFFORD_PROB_PIAD.keys())

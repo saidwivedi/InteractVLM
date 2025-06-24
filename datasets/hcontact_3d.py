@@ -2,16 +2,11 @@ import os
 import random
 from os.path import isfile
 import sys
-import cv2
 import tqdm
 import numpy as np
 import torch
 import joblib as jl
-import torch.nn.functional as F
-from torchvision import transforms
-from PIL import Image
-from transformers import CLIPImageProcessor
-from os.path import join, isdir, isfile, basename
+from os.path import join, isfile, basename
 
 # Dynamically add the necessary paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -25,13 +20,10 @@ sys.path.append(model_path)
 sys.path.append(utils_path)
 sys.path.append(data_path)
 
-from model.llava import conversation as conversation_lib
-from model.segment_anything.utils.transforms import ResizeLongestSide
 
 from utils.utils import HCONTACT_ANSWER_LIST
 from utils.utils import HCONTACT_QUESTION_LIST
 from utils.utils import HCONTACT_PARTS_QUESTION_LIST, HCONTACT_PARTS_ANSWER_LIST
-from utils.utils import SAM_MEAN_PIXEL, SAM_STD_PIXEL, IGNORE_LABEL
 
 from .base_contact_dataset import BaseContactSegDataset, normalize_cam_params
 
@@ -44,10 +36,13 @@ def check_paths_exist(paths, printstr=''):
 
 def init_damon_hcontact(base_image_dir, view_dict, split='Train', sam_input_type='grey', contact_mask_type='objectwise', train_fraction=1.0):   
 
-    folderpath, grid_size   = view_dict['folder'], view_dict['grid_size']
+    folderpath = view_dict['folder']
     num_vertices = view_dict['num_vertices']
     cam_params_dict = view_dict['cam_params']
     view_names = view_dict['names'].flatten()
+    contact_annot_f = view_dict['contact_annot_f'] if split.lower() == 'train' else 'contact_label_objectwise.pkl'
+    body_parts_annot_f = view_dict['body_parts_annot_f'] if split.lower() == 'train' else 'body_parts_objectwise.pkl'
+    ignore_keywords = view_dict['ignore_keywords']
 
     base_image_dir = join(base_image_dir, f'damon/{split}')
     img_list = np.load(join(base_image_dir, f'imgname.npy'), allow_pickle=True)
@@ -57,43 +52,21 @@ def init_damon_hcontact(base_image_dir, view_dict, split='Train', sam_input_type
     gt_contact_3d, labels, valid_llava_images, body_parts = [], [], [], []
     num_examples_per_class = {}
 
-    if contact_mask_type == 'all_contact': ### TODO: I think it is deprecated, check if the model is trained in this mode 
+    if contact_mask_type == 'objectwise':
 
-        all_contact_annot = np.load(join(base_image_dir, f'contact_label.npy'), allow_pickle=True)
-        body_parts_annot = jl.load(join(base_image_dir, f'body_parts_all.pkl'))
-        for idx, llava_image in tqdm.tqdm(enumerate(llava_images)):
-            
-            base_name = os.path.basename(llava_image)[:-4]
-            # process all contact masks
-            mask_all_contact = [
-                join(base_image_dir, folderpath, 'all_contact', f'{base_name}_{view}.png')
-                for view in view_names
-            ]
-            if not check_paths_exist(mask_all_contact, printstr=f'all_contact_{idx}'):
-                continue
-            
-            vertices_all_contact = torch.tensor(all_contact_annot[idx]).int()
-
-            body_parts_sample = ', '.join(body_parts_annot[base_name])
-            body_parts.append(body_parts_sample)
-            
-            labels.append(mask_all_contact)
-            gt_contact_3d.append(vertices_all_contact)
-            valid_llava_images.append(llava_image)
-
-        classes = [['all the objects or ground']] * len(valid_llava_images) # objname consistent with questions
-
-    elif contact_mask_type == 'objectwise':
-
-        objectwise_contact_annot = np.load(join(base_image_dir, f'contact_label_objectwise.npy'), allow_pickle=True)
-        body_parts_annot = jl.load(join(base_image_dir, f'body_parts_objectwise.pkl'))
+        objectwise_contact_annot = jl.load(join(base_image_dir, contact_annot_f))
+        body_parts_annot = jl.load(join(base_image_dir, body_parts_annot_f))
         for idx, llava_image in tqdm.tqdm(enumerate(llava_images)):
 
             base_name = os.path.basename(llava_image)[:-4]
             
             # Process object-wise contacts
             for obj_name, contact_vertices in objectwise_contact_annot[idx].items():
-                
+
+                if ignore_keywords and any(keyword in obj_name for keyword in ignore_keywords):
+                    print(f'Ignoring object {obj_name} due to ignore keywords: {ignore_keywords}')
+                    continue
+
                 contact_array = torch.zeros(num_vertices).int()
                 if len(contact_vertices) == 0:
                     continue
@@ -113,17 +86,18 @@ def init_damon_hcontact(base_image_dir, view_dict, split='Train', sam_input_type
                 # Get body parts name in contact
                 body_parts_sample = ', '.join(body_parts_annot[f'{base_name}_{obj_name}'])
                 body_parts.append(body_parts_sample)
-                
-                # Replace certain keywords in the object name
-                ##### TODO: Check if this is necessary #####
-                if 'supporting' in obj_name:
-                    # continue
-                    obj_name = obj_name.replace('supporting', 'support object or ground')
+
+                # If the object is a foot ground, we use 'ground' as the object name
+                if 'foot_ground' in obj_name:
+                    obj_name = 'ground'
 
                 labels.append(obj_masks)
                 gt_contact_3d.append(contact_array)
                 valid_llava_images.append(llava_image)
                 classes.append([obj_name])
+
+    else:
+        print(f'Using {contact_mask_type} contact mask type is deprecated. Please use "objectwise" instead.')
 
     # Filter data for training split
     if split.lower() == 'train' and train_fraction < 1.0:
@@ -156,7 +130,7 @@ def init_damon_hcontact(base_image_dir, view_dict, split='Train', sam_input_type
 
     sam_images_path, cam_params_list = [], []
     for view_name in view_names:
-        sam_images_path.append(join(base_image_dir, f'{folderpath}/body_render_{sam_input_type}_{view_name}.png'))
+        sam_images_path.append(f'./data/hcontact_vitruvian/body_render_{sam_input_type}_{view_name}.png')
         cam_params_list.append(normalize_cam_params(cam_params_dict[view_name]))
 
     cam_params = [cam_params_list] * len(valid_llava_images)
@@ -165,9 +139,8 @@ def init_damon_hcontact(base_image_dir, view_dict, split='Train', sam_input_type
     
 
 def init_lemon_hcontact(base_image_dir, view_dict, split='train', sam_input_type='grey'):
-    
-    folderpath, grid_size   = view_dict['folder'], view_dict['grid_size']
-    num_vertices = view_dict['num_vertices']
+
+    folderpath = view_dict['folder']
     cam_params_dict = view_dict['cam_params']
     view_names = view_dict['names'].flatten()
 
@@ -213,7 +186,7 @@ def init_lemon_hcontact(base_image_dir, view_dict, split='train', sam_input_type
 
     sam_images_path, cam_params_list = [], []
     for view_name in view_names:
-        sam_images_path.append(join(base_image_dir, f'lemon/{folderpath}/body_render_{sam_input_type}_{view_name}.png'))
+        sam_images_path.append(f'./data/hcontact_vitruvian/body_render_{sam_input_type}_{view_name}.png')
         cam_params_list.append(normalize_cam_params(cam_params_dict[view_name]))
 
     cam_params = [cam_params_list] * len(valid_llava_images)
