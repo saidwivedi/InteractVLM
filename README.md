@@ -80,19 +80,19 @@
       <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip"><code>interactvlm-3d-hcontact-damon</code></a></td>
       <td><img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"></td>
       <td><sub><a href="https://deco.is.tue.mpg.de">DAMON</a></sub></td>
-      <td>Won RHOBIN Human Contact Challenge (CVPR 2025)</td>
+      <td>Winner of RHOBIN Human Contact Challenge (CVPR 2025)</td>
       <td>
         <img src="https://img.shields.io/badge/✅_Available-green" alt="Available">
       </td>
     </tr>
     <tr>
       <td>2</td>
-      <td><code>interactvlm-3d-hcontact-damon-lemon</code></td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-wScene-damon-lemon-rich.zip"><code>interactvlm-3d-hcontact-wScene</code></a></td>
       <td><img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"></td>
-      <td><sub><a href="https://deco.is.tue.mpg.de">DAMON</a> + <a href="https://yyvhang.github.io/LEMON/">LEMON-HU</a></sub></td>
+      <td><sub><a href="https://deco.is.tue.mpg.de">DAMON</a> + <a href="https://yyvhang.github.io/LEMON/">LEMON-HU</a> + <a href="https://rich.is.tue.mpg.de">RICH</a></sub></td>
       <td>Best in-the-wild 3D Human Contact Estimation (with foot ground contact)</td>
       <td>
-        <img src="https://img.shields.io/badge/🔄_Coming_Soon-orange" alt="Coming Soon">
+        <img src="https://img.shields.io/badge/✅_Available-green" alt="Available">
       </td>
     </tr>
     <tr>
@@ -114,7 +114,8 @@
       <td>
         <sub>
         <a href="https://deco.is.tue.mpg.de">DAMON</a> + 
-        <a href="https://yyvhang.github.io/LEMON/">LEMON-HU</a> + 
+        <a href="https://yyvhang.github.io/LEMON/">LEMON-HU</a> +
+        <a href="https://rich.is.tue.mpg.de">RICH</a> +  
         <a href="https://yyvhang.github.io/LEMON/">LEMON-OBJ</a> + 
         <a href="https://yyvhang.github.io/publications/IAG/index.html">PIAD</a> + 
         <a href="https://pico.is.tue.mpg.de">PICO</a>
@@ -191,19 +192,12 @@
 ```
 InteractVLM/
 ├── 📁 model/                         # Core model implementation
-│   ├── ..
 ├── 📁 datasets/                      # Data loading and processing
-│   ├── ..
 ├── 📁 utils/                         # Utility functions
-│   ├── ..
 ├── 📁 preprocess_data/               # Data preprocessing scripts
-│   ├── ..
 ├── 📁 scripts/                       # Execution scripts
-│   ├── ..
 ├── 📁 data/                          # Dataset folders, Body models, Demo samples
-│   ├── ..
 ├── 📁 trained_models/                # Trained models
-│   ├── ..
 ├── 📄 train.py                       # Main training script
 ├── 📄 evaluate.py                    # Main evaluation script
 ├── 📄 run_demo.py                    # Run Demo
@@ -231,18 +225,25 @@ Run the demo on your own images with either human or object interaction estimati
 
 ```bash
 # For 3D human contact estimation
-bash scripts/run_demo.sh hcontact
+bash scripts/run_demo.sh hcontact data/demo_samples folder
 
 # For 3D object affordance estimation  
-bash scripts/run_demo.sh oafford
+bash scripts/run_demo.sh oafford data/demo_samples folder
 ```
 
 **Demo Requirements:**
 
-- **Human Contact Demo**: The canonical human mesh and rendered input are already provided. Simply run the script to estimate 3D contact points on human bodies.
+- **Human Contact Demo**: The canonical human mesh and rendered input are already provided. Simply run the script to estimate 3D contact points on human bodies. We now also support human contact estimation with scene (e.g. ground or undefined objects) with the latest released model. Download the latest model using `hcontact-wScene` argument in `fetch_data.sh` and use the same argument while running the demo script. The object name in the image filename serves as the query object for contact estimation (e.g., "bottle" or "chair"). To estimate contact with the scene or ground, use "scene" as the query or prefix the filename with "scene".
 
 - **Object Affordance Demo**: The code expects an object mesh as input. The script will automatically render multiple views of the object for affordance prediction.
 
+**Input Modes:**
+
+The demo supports two input structures:
+
+1. **Folder-based mode** (default): Each sample in its own folder
+2. **File-based mode**: All samples as files in a single folder. E.g. Estimating human contact for video frames (**human contact only**)
+   
 **Sample Data**: The `data/demo_samples/` directory contains ready-to-use samples for testing both human contact and object affordance estimation. One should get the following results:
 
 <p align="center">
@@ -313,7 +314,7 @@ The UvA part of the team is supported by an ERC Starting Grant (STRIPES, 1011653
 InteractVLM builds upon several excellent open-source projects and datasets:
 
 - **[LISA](https://github.com/dvlab-research/LISA)** - InteractVLM is built on top of this foundational framework
-- **[LEMON](https://yyvhang.github.io/LEMON/)**, **[DECO](https://deco.is.tue.mpg.de)**, and **[PIAD](https://github.com/yyvhang/IAGNet)** - For human contact and object affordance data
+- **[LEMON](https://yyvhang.github.io/LEMON/)**, **[DECO](https://deco.is.tue.mpg.de)**, **[PIAD](https://github.com/yyvhang/IAGNet)**, **[PICO](https://pico.is.tue.mpg.de)** and **[RICH](https://rich.is.tue.mpg.de)** - For human contact and object affordance data
 - **[Blendify](https://github.com/ptrvilya/blendify/)** - For rendering
 
 ### Optimization Pipeline

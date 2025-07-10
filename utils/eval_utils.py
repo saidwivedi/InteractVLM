@@ -224,6 +224,7 @@ def get_args_for_eval(args):
     args.val_batch_size = eval_args.val_batch_size
     args.exp_name = f'eval_{args.exp_name}'
     args.disp_size = max(512, eval_args.disp_size)
+    args.dataset_dir = './data'
     args.dataset = 'vqa' # some random dataset
     args.eval_only = True
     args.train_from_LISA = False

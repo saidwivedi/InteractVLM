@@ -1,6 +1,5 @@
 import glob
 import os
-import random
 
 import cv2
 import numpy as np
@@ -10,8 +9,7 @@ from pycocotools import mask
 from transformers import CLIPImageProcessor
 
 from model.llava import conversation as conversation_lib
-from model.llava.constants import (DEFAULT_IMAGE_TOKEN, IGNORE_INDEX,
-                                   IMAGE_TOKEN_INDEX)
+from model.llava.constants import (DEFAULT_IMAGE_TOKEN, IGNORE_INDEX)
 from model.llava.mm_utils import tokenizer_image_token
 from model.segment_anything.utils.transforms import ResizeLongestSide
 
@@ -25,7 +23,6 @@ from .hcontact_2d import H2DContactSegDataset
 from .ocontact_3d import OContactSegDataset, OAffordSegDataset
 from .vqa_dataset import VQADataset
 
-from utils.conversation import get_default_conv_template
 from utils.utils import (DEFAULT_IM_END_TOKEN, DEFAULT_IM_START_TOKEN,
                     DEFAULT_IMAGE_TOKEN)
 

@@ -62,7 +62,7 @@ class BaseContactSegDataset(torch.utils.data.Dataset):
         vision_tower,
         image_size=1024,
     ):
-        self.base_image_dir = "./data/"
+        self.base_image_dir = base_image_dir
         self.ignore_label = IGNORE_LABEL
         self.image_size = image_size
         self.tokenizer = tokenizer

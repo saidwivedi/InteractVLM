@@ -41,9 +41,10 @@ password=$(urle $password)
 
 mkdir -p ./trained_models
 
-# Define download URLs (using placeholder links for now)
+# Define download URLs
 DATA_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=data.zip'
 HCONTACT_DAMON_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip'
+HCONTACT_DAMON_LEMON_RICH_WSCENE_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-wScene-damon-lemon-rich.zip'
 OAFFORD_LEMON_PIAD_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-oafford-lemon-piad.zip'
 DAMON_DATASET_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=damon.tar.gz'
 
@@ -58,6 +59,10 @@ elif [ "$1" = "damon-dataset" ]; then
     # damon-dataset argument provided - download only that file
     echo "Downloading DAMON dataset only..."
     download_and_extract_targz "$DAMON_DATASET_URL"
+elif [ "$1" = "hcontact-wScene" ]; then
+    # hcontact-wScene argument provided - download the specific model
+    echo "Downloading Human Contact with Scene model..."
+    download_and_unzip "$HCONTACT_DAMON_LEMON_RICH_WSCENE_MODEL_URL"
 else
     echo "Unknown argument: $1"
     echo "Usage: $0 [damon-dataset]"

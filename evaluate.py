@@ -221,7 +221,7 @@ def validate(val_loader, model_engine, epoch, loggers, args, ds_name):
         
         print(f'Epoch: {epoch}, {ds_name}: giou: {giou:.4f}, ciou: {ciou:.4f}')
         if hcontact_metric:
-            print(f'Contact Metrics for human - F1: {hcontact_f1_meter.avg:.4f}, '
+            print(f'Contact Metrics (Semantic) for human - F1: {hcontact_f1_meter.avg:.4f}, '
                   f'Precision: {hcontact_precision_meter.avg:.4f}, '
                   f'Recall: {hcontact_recall_meter.avg:.4f}',
                   f'Geo: {hcontact_geo_meter.avg:.4f}')
@@ -472,7 +472,6 @@ def main_eval(args):
     kwargs = {"torch_dtype": torch_dtype}
     kwargs.update({"train_from_LISA": False})
     kwargs.update({"train_from_LLAVA": False})
-    kwargs.update({"oC_sam_view_type": "4MV-Z_HM_MeshInf"})
 
 
     model = InteractVLMForCausalLM.from_pretrained(

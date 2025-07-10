@@ -68,14 +68,8 @@ class VQADataset(torch.utils.data.Dataset):
             elif 'damon' == vqa_data_name:
                 data_path = os.path.join(base_image_dir, "hoi_vqa/damon.json")
                 image_root = os.path.join(base_image_dir, "damon/train/images")
-            elif 'damon_c' == vqa_data_name:
-                data_path = os.path.join(base_image_dir, "hoi_vqa/damon_hcontact.json")
-                image_root = os.path.join(base_image_dir, "damon/train/images")
             elif 'lemon' == vqa_data_name:
                 data_path = os.path.join(base_image_dir, "hoi_vqa/lemon.json")
-                image_root = os.path.join(base_image_dir, "lemon/images_vqa")
-            elif 'lemon_c' == vqa_data_name:
-                data_path = os.path.join(base_image_dir, "hoi_vqa/lemon_hcontact.json")
                 image_root = os.path.join(base_image_dir, "lemon/images_vqa")
             elif 'piad_seen' == vqa_data_name:
                 data_path = os.path.join(base_image_dir, "hoi_vqa/piad_seen.json")

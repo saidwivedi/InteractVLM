@@ -4,12 +4,12 @@
 export PATH=$PATH
 export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
 export HF_HOME='.cache/huggingface'
-# export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
+export HF_HOME='/is/cluster/sdwivedi/.cache/huggingface'
 
 
 # generate random number between 20000 and 25000
 MASTER_PORT=$(( ( RANDOM % 5000 )  + 20000 ))
-VISION_PRETRAINED="../pretrained_models/sam_vit_h_4b8939.pth"
+VISION_PRETRAINED="./data/sam_vit_h_4b8939.pth"
 
 
 get_gpu_memory() {
@@ -24,9 +24,9 @@ gpu_memory_in_gb=$(($gpu_memory / 1024))
 # Function to set configuration based on numerical argument
 set_configuration() {
   case $1 in
-    0)
+    "hcontact-damon")
       EXP_NAME="eval_damon_hcontact"
-      VERSION="trained_models/DAMON_LLaVA-13B"
+      VERSION="trained_models/interactvlm-3d-hcontact-damon"
       LOG_WANDB="False"
       VAL_DATASET="damon_hcontact"
       DISP_SIZE="128"
@@ -40,7 +40,7 @@ set_configuration() {
 
 # Check if an argument is provided
 if [ -z "$1" ]; then
-  echo "Please provide a configuration number (e.g., 0, 1)."
+  echo "Please provide proper argument for evaluation e.g. hcontact-damon"
   exit 1
 fi
 

@@ -3,16 +3,10 @@ import os
 import random
 from os.path import isfile
 import sys
-import cv2
-import tqdm
 import numpy as np
 import torch
 import joblib as jl
-import torch.nn.functional as F
-from torchvision import transforms
-from PIL import Image
-from transformers import CLIPImageProcessor
-from os.path import join, isdir, isfile, basename
+from os.path import join, isfile
 
 # Dynamically add the necessary paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -26,9 +20,6 @@ sys.path.append(model_path)
 sys.path.append(utils_path)
 sys.path.append(data_path)
 
-from model.llava import conversation as conversation_lib
-from model.segment_anything.utils.transforms import ResizeLongestSide
-
 from preprocess_data.constants import VALID_OBJ_NAMES_LEMON, AFFORD_PROB_LEMON, VALID_OBJ_NAMES_PIAD, AFFORD_PROB_PIAD, AFFORD_LIST_PIAD, AFFORD_LIST_LEMON
 from preprocess_data.generate_lemon_obj_heatmap import extract_point_file_lemon
 from preprocess_data.generate_piad_obj_heatmap import extract_point_file_piad
@@ -36,7 +27,6 @@ from preprocess_data.generate_piad_obj_heatmap import extract_point_file_piad
 from utils.utils import OAFFORD_ANSWER_LIST, OCONTACT_ANSWER_LIST
 from utils.utils import OAFFORD_QUESTION_LIST, OCONTACT_QUESTION_LIST
 from utils.utils import OAFFORD_AFFORD_QUESTION_LIST, OAFFORD_AFFORD_ANSWER_LIST, OAFFORD_AFFORD_OBJ_ANSWER_LIST
-from utils.utils import SAM_MEAN_PIXEL, SAM_STD_PIXEL, IGNORE_LABEL
 
 from .base_contact_dataset import BaseContactSegDataset, normalize_cam_params
 

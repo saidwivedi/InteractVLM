@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import copy
-from transformers import BitsAndBytesConfig, CLIPVisionModel
 
 from utils.utils import debug_tensor, IGNORE_LABEL
 
