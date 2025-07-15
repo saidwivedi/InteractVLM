@@ -15,6 +15,7 @@ import torchshow as ts
 from .hcontact_3d import HContactSegDataset
 from .ocontact_3d import OContactSegDataset, OAffordSegDataset
 from .hcontact_2d import H2DContactSegDataset
+from .hcontactScene_3d import HContactSceneSegDataset
 from .sem_seg_dataset import SemSegDataset
 from .vqa_dataset import VQADataset
 from .dataset import ValDataset
@@ -64,6 +65,32 @@ def test_dataloader_loading():
             is_train=True,
             image_size=1024,
             question_type='simple',
+        )
+
+        # Get an item from the dataset to ensure it loads correctly
+        for i in range(max_num_images):
+            disp_imgs = []
+            sample = contact_train_dataset[i]
+            sample[4][sample[4] == IGNORE_LABEL] = 0
+            print_batch(sample)
+            disp_imgs.extend([sample[1]] if sample[1].ndim < 4 else [x for x in sample[1]])
+            disp_imgs.extend([sample[2]]) 
+            disp_imgs.extend([sample[4]] if sample[4].ndim < 4 else [x for x in sample[4]])
+            ts.show(disp_imgs)
+
+    # ################ HContactScene -- train ################
+
+    if 'human_scene_train' in display_datasets:
+        contact_train_dataset = HContactSceneSegDataset(
+            base_image_dir='path/to/base_image_dir',
+            tokenizer=mock_tokenizer,
+            vision_tower=mock_vision_tower,
+            contact_dataset_config=contact_dataset_config,
+            is_train=True,
+            image_size=1024,
+            samples_per_epoch=10,
+            num_classes_per_sample=3,
+            contact_seg_data='rich_hcontact',
         )
 
         # Get an item from the dataset to ensure it loads correctly

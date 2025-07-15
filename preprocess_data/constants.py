@@ -361,7 +361,7 @@ HUMAN_VIEW_DICT = {
                         'bottomback':  [2., 315., 135, 0., 0.3]
                     }
                 }, 
-    '4MV-Z_Vitru_FootGround':
+    '4MV-Z_Vitru_wScene':
                     {'order': 'fix',
                     'num_vertices': 6890,
                     'grid_size': np.array([4, 1, 1]),
@@ -375,7 +375,7 @@ HUMAN_VIEW_DICT = {
                                        [['bottomfront']],
                                        [['topback']],
                                        [['bottomback']]]),
-                    'ignore_keywords': [],
+                    'ignore_keywords': ['supporting'], # Skip "supporting" class from DAMON as it might confuse with "scene" from RICH dataset
                     'cam_params': {
                         'topfront':    [2., 45., 315., 0., 0.],
                         'bottomfront': [2., 315., 315., 0., 0.3],

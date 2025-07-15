@@ -34,156 +34,43 @@ def check_paths_exist(paths, printstr=''):
             return False
     return True
 
-def init_damon_hcontact(base_image_dir, view_dict, split='Train', sam_input_type='grey', contact_mask_type='objectwise', train_fraction=1.0):   
 
-    folderpath = view_dict['folder']
-    num_vertices = view_dict['num_vertices']
-    cam_params_dict = view_dict['cam_params']
-    view_names = view_dict['names'].flatten()
-    contact_annot_f = view_dict['contact_annot_f'] if split.lower() == 'train' else 'contact_label_objectwise.pkl'
-    body_parts_annot_f = view_dict['body_parts_annot_f'] if split.lower() == 'train' else 'body_parts_objectwise.pkl'
-    ignore_keywords = view_dict['ignore_keywords']
-
-    base_image_dir = join(base_image_dir, f'damon/{split}')
-    img_list = np.load(join(base_image_dir, f'imgname.npy'), allow_pickle=True)
-    llava_images = [join(base_image_dir, f'images/{os.path.basename(f)}') for f in img_list]
-
-    classes = []
-    gt_contact_3d, labels, valid_llava_images, body_parts = [], [], [], []
-    num_examples_per_class = {}
-
-    if contact_mask_type == 'objectwise':
-
-        objectwise_contact_annot = jl.load(join(base_image_dir, contact_annot_f))
-        body_parts_annot = jl.load(join(base_image_dir, body_parts_annot_f))
-        for idx, llava_image in tqdm.tqdm(enumerate(llava_images)):
-
-            base_name = os.path.basename(llava_image)[:-4]
-            
-            # Process object-wise contacts
-            for obj_name, contact_vertices in objectwise_contact_annot[idx].items():
-
-                # Skip "supporting" class as it might confuse with "scene" from RICH dataset
-                if ignore_keywords and any(keyword in obj_name for keyword in ignore_keywords):
-                    print(f'Ignoring object {obj_name} due to ignore keywords: {ignore_keywords}')
-                    continue
-
-                contact_array = torch.zeros(num_vertices).int()
-                if len(contact_vertices) == 0:
-                    continue
-                contact_array[contact_vertices] = 1
-                    
-                obj_masks = [
-                    join(base_image_dir, folderpath, obj_name, f'{base_name}_{view}.png')
-                    for view in view_names
-                ]
-                if not check_paths_exist(obj_masks, printstr=f'objectwise_{obj_name}_{idx}'):
-                    continue
-                # Count number of examples of contact per object category
-                if obj_name not in num_examples_per_class.keys():
-                    num_examples_per_class[obj_name] = 0
-                num_examples_per_class[obj_name] += 1
-
-                # Get body parts name in contact
-                body_parts_sample = ', '.join(body_parts_annot[f'{base_name}_{obj_name}'])
-                body_parts.append(body_parts_sample)
-
-                # If the object is a foot ground, we use 'ground' as the object name
-                if 'foot_ground' in obj_name:
-                    obj_name = 'scene' # Keeping the same convention as RICH dataset
-
-                labels.append(obj_masks)
-                gt_contact_3d.append(contact_array)
-                valid_llava_images.append(llava_image)
-                classes.append([obj_name])
-
-    else:
-        print(f'Using {contact_mask_type} contact mask type is deprecated. Please use "objectwise" instead.')
-
-    # Filter data for training split
-    if split.lower() == 'train' and train_fraction < 1.0:
-        total_samples = len(valid_llava_images)
-        num_train_samples = int(total_samples * train_fraction)
-        # Use random seed for reproducibility
-        np.random.seed(42)
-        selected_indices = np.random.choice(total_samples, num_train_samples, replace=False)
-        selected_indices.sort()  # Sort indices for consistency
-        
-        valid_llava_images = [valid_llava_images[i] for i in selected_indices]
-        labels = [labels[i] for i in selected_indices]
-        gt_contact_3d = [gt_contact_3d[i] for i in selected_indices]
-        classes = [classes[i] for i in selected_indices]
-        body_parts = [body_parts[i] for i in selected_indices]
-        
-        print(f"Selected {len(valid_llava_images)} samples for training out of {total_samples} total samples")
-        
-        # Recalculate num_examples_per_class for the selected samples
-        num_examples_per_class = {}
-        for cls in classes:
-            obj_name = cls[0]
-            if obj_name not in num_examples_per_class:
-                num_examples_per_class[obj_name] = 0
-            num_examples_per_class[obj_name] += 1
-                
-    total_examples = sum(num_examples_per_class.values())
-    print(f'Number of examples per class in {split} for HContact DAMON with {len(list(num_examples_per_class.keys()))} classes')
-    print(f'{num_examples_per_class} with total examples: \nTotal number of samples: {total_examples}')
-
-    sam_images_path, cam_params_list = [], []
-    for view_name in view_names:
-        sam_images_path.append(f'./data/hcontact_vitruvian/body_render_{sam_input_type}_{view_name}.png')
-        cam_params_list.append(normalize_cam_params(cam_params_dict[view_name]))
-
-    cam_params = [cam_params_list] * len(valid_llava_images)
-
-    return classes, valid_llava_images, labels, sam_images_path, gt_contact_3d, cam_params, body_parts
+def init_rich_hcontact(base_image_dir, view_dict, split='train', sam_input_type='grey'):
     
-
-def init_lemon_hcontact(base_image_dir, view_dict, split='train', sam_input_type='grey'):
-
     folderpath = view_dict['folder']
     cam_params_dict = view_dict['cam_params']
     view_names = view_dict['names'].flatten()
 
+    rich_folder = 'rich'
     classes, labels, valid_llava_images, body_parts = [], [], [], []
-    img_list = open(join(base_image_dir, f'lemon/txt_scripts/{split}.txt')).read().splitlines()
-    body_parts_annot = jl.load(join(base_image_dir, f'lemon/body_parts_{split}.pkl'))
+    img_list = jl.load(join(base_image_dir, f'{rich_folder}/img_list_{split}.pkl'))
+    body_parts_annot = jl.load(join(base_image_dir, f'{rich_folder}/body_parts_{split}.pkl'))
+    contact_annot = jl.load(join(base_image_dir, f'{rich_folder}/contact_vertices_{split}.pkl'))
 
-    llava_images = [join(base_image_dir, f) for f in img_list]
+    llava_images = [join(base_image_dir, f'{rich_folder}/images', f) for f in img_list]
 
     gt_contact_3d = []
-    num_examples_per_class = {}
-    num_zero_contact = 0
+    classname = 'scene' # For RICH, contact is captured for the entire scene
     for idx, llava_image in tqdm.tqdm(enumerate(llava_images)):
         mask_list = []
 
-        # Count number of examples per class
-        object_name = basename(llava_image).split('_')[0]
-        if object_name not in num_examples_per_class.keys():
-            num_examples_per_class[object_name] = 0
-        num_examples_per_class[object_name] += 1
-
-        contact_vertices = jl.load(llava_image.replace('Images', 'smplh_contact_pkl')[:-4] + '.pkl')
+        contact_vertices = contact_annot[basename(llava_image)]
         if contact_vertices.nonzero()[0].shape[0] == 0:
             print(f'Warning: No contact pixels in the mask for {llava_image}')
             continue
 
         # Generate mask paths for each view
         for view_name in view_names:
-            mask_list.append(llava_image.replace('Images', folderpath)[:-4] + f'_{view_name}.png')
+            mask_list.append(llava_image.replace('images/', f'{folderpath}/')[:-4] + f'_{view_name}.png')
 
-        body_parts_sample = ', '.join(body_parts_annot[basename(llava_image)[:-4]])
+        body_parts_sample = ', '.join(body_parts_annot[basename(llava_image)])
         body_parts.append(body_parts_sample)    
 
         labels.append(mask_list)
         valid_llava_images.append(llava_image)
         gt_contact_3d.append(torch.from_numpy(contact_vertices).int())
-        classes.append([object_name])
+        classes.append([classname])
     
-    print(f'Number of images with zero contact: {num_zero_contact}')
-
-    total_examples = sum(num_examples_per_class.values())
-    print(f'Number of examples per class in {split} for HContact Lemon: {num_examples_per_class} with total examples: {total_examples}')
 
     sam_images_path, cam_params_list = [], []
     for view_name in view_names:
@@ -195,7 +82,7 @@ def init_lemon_hcontact(base_image_dir, view_dict, split='train', sam_input_type
     return classes, valid_llava_images, labels, sam_images_path, gt_contact_3d, cam_params, body_parts
 
 
-class HContactSegDataset(BaseContactSegDataset):
+class HContactSceneSegDataset(BaseContactSegDataset):
 
     def __init__(
         self,
@@ -246,19 +133,12 @@ class HContactSegDataset(BaseContactSegDataset):
         self.sam_dict, self.data2list, self.data2classes, self.ds_size = {}, {}, {}, {}
 
         for ds in self.contact_seg_data:
-            # Initialize LEMON Human Contact dataset
-            if 'lemon' in ds:
+            # Initialize RICH Human Contact dataset
+            if 'rich' in ds:
                 split = 'train' if is_train else 'val'
                 print(f'\nInitializing dataset: {ds} with split: {split}')
                 classes, llava_images, labels, sam_images_path, gt_contact_3d, cam_params, body_parts = \
-                    init_lemon_hcontact(self.base_image_dir, self.view_dict, split=split, sam_input_type=self.sam_input_type)
-                print(f'---> Initialized dataset: {ds} with {len(llava_images)} images')
-            # Initialize DAMON Human Contact dataset
-            elif 'damon' in ds:
-                split = 'train' if is_train else 'test'
-                print(f'\nInitializing dataset: {ds} with split: {split}')
-                classes, llava_images, labels, sam_images_path, gt_contact_3d, cam_params, body_parts = \
-                    init_damon_hcontact(self.base_image_dir, self.view_dict, split, self.sam_input_type, self.contact_mask_type, self.train_fraction)
+                    init_rich_hcontact(self.base_image_dir, self.view_dict, split=split, sam_input_type=self.sam_input_type)
                 print(f'---> Initialized dataset: {ds} with {len(llava_images)} images')
             # Since we are using fixed SAM images, we can load them once and use them for all samples
             self.sam_images, self.valid_regions, self.resize = \
@@ -356,5 +236,3 @@ class HContactSegDataset(BaseContactSegDataset):
             results = results + (inference,)
 
         return results
-
-

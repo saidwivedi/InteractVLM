@@ -20,6 +20,7 @@ from .refer_seg_dataset import ReferSegDataset
 from .sem_seg_dataset import SemSegDataset
 from .hcontact_3d import HContactSegDataset
 from .hcontact_2d import H2DContactSegDataset
+from .hcontactScene_3d import HContactSceneSegDataset
 from .ocontact_3d import OContactSegDataset, OAffordSegDataset
 from .vqa_dataset import VQADataset
 
@@ -204,6 +205,7 @@ class HybridDataset(torch.utils.data.Dataset):
         ocontact_seg_data="pico_ocontact",
         hcontact_seg_data="lemon_hcontact",
         h2dcontact_seg_data="damon_h2dcontact",
+        hcontactScene_seg_data="rich_hcontact",
         explanatory=0.1,
     ):
 
@@ -315,6 +317,22 @@ class HybridDataset(torch.utils.data.Dataset):
                         image_size,
                         samples_per_epoch,
                         h2dcontact_seg_data,
+                    )
+                )
+            elif dataset == "hcontactScene_seg":
+                num_classes_per_sample = 1
+                is_train = True
+                self.all_datasets.append(
+                    HContactSceneSegDataset(
+                        base_image_dir,
+                        tokenizer,
+                        vision_tower,
+                        contact_dataset_config,
+                        is_train,
+                        image_size,
+                        samples_per_epoch,
+                        num_classes_per_sample,
+                        hcontactScene_seg_data,
                     )
                 )
             elif dataset == "oafford_seg":

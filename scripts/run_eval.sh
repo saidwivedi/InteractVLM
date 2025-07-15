@@ -31,6 +31,13 @@ set_configuration() {
       VAL_DATASET="damon_hcontact"
       DISP_SIZE="128"
       ;;
+    "hcontact-wScene-damon-lemon-rich")
+      EXP_NAME="eval_damon_hcontact_lemon_rich"
+      VERSION="trained_models/interactvlm-3d-hcontact-wScene-damon-lemon-rich"
+      LOG_WANDB="False"
+      VAL_DATASET="damon_hcontact"
+      DISP_SIZE="128"
+      ;;
     *)
       echo "Unknown configuration number: $1"
       exit 1

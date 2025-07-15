@@ -71,6 +71,7 @@ def parse_args(args):
     parser.add_argument("--ocontact_seg_data", default="pico_ocontact", type=str)
     parser.add_argument("--hcontact_seg_data", default="damon_hcontact||lemon_hcontact", type=str)
     parser.add_argument("--h2dcontact_seg_data", default="damon_h2dcontact", type=str)
+    parser.add_argument("--hcontactScene_seg_data", default="rich_hcontact", type=str)
     parser.add_argument("--val_dataset", default="damon_hcontact", type=str)
     parser.add_argument("--dataset_dir", default="./data", type=str)
     parser.add_argument("--log_base_dir", default="./runs", type=str)
@@ -339,6 +340,7 @@ def main(args):
         ocontact_seg_data=args.ocontact_seg_data,
         hcontact_seg_data=args.hcontact_seg_data,
         h2dcontact_seg_data=args.h2dcontact_seg_data, 
+        hcontactScene_seg_data=args.hcontactScene_seg_data,
         explanatory=args.explanatory,
     )
 
