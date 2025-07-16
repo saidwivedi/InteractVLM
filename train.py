@@ -351,7 +351,8 @@ def main(args):
 
     ds_config = {
         "train_micro_batch_size_per_gpu": args.batch_size,
-        "gradient_accumulation_steps": args.grad_accumulation_steps,
+        # Since this is handled manually in train loop, setting it to 1 to avoid double accumulation
+        "gradient_accumulation_steps": 1, 
         "optimizer": {
             "type": "AdamW",
             "params": {"lr": args.lr, "weight_decay": 0.0, "betas": (args.beta1, args.beta2),},
