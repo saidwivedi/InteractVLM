@@ -33,6 +33,8 @@ def parse_args(args):
     parser.add_argument("--version", default="xinlai/LISA-13B-llama2-v1")
     parser.add_argument("--contact_type", default="hcontact", type=str)
     parser.add_argument("--img_folder", default="", type=str)
+    parser.add_argument("--input_mode", default="folder", type=str, choices=["folder", "file"],
+                        help="Input mode: 'folder' for folder-based samples, 'file' for file-based samples (human contact only)")
     parser.add_argument(
         "--precision",
         default="bf16",
@@ -172,13 +174,41 @@ def main(args):
     camera_params_humans, camera_params_objects = None, None
 
     llava_image_paths, sam_image_paths, overlay_sam_paths, lift2d_dict_paths = [], [], [], []
-    for img_sample_folder in sorted(os.listdir(img_folder)):
-        llava_image_paths.append(os.path.join(img_folder, img_sample_folder, f'{img_sample_folder}.jpg'))
+    
+    # Handle different input modes
+    if args.input_mode == "folder":
+        # Folder-based: each sample in its own folder
+        for img_sample_folder in sorted(os.listdir(img_folder)):
+            folder_path = os.path.join(img_folder, img_sample_folder)
+            if os.path.isdir(folder_path):
+                llava_image_paths.append(os.path.join(folder_path, f'{img_sample_folder}.jpg'))
+    else:
+        # File-based: all samples as files in a single folder
+        for img_file in sorted(os.listdir(img_folder)):
+            if img_file.lower().endswith(('.jpg', '.jpeg', '.png')) and '__' in img_file:
+                llava_image_paths.append(os.path.join(img_folder, img_file))
+    
+    # Create output directory for file-based mode
+    if args.input_mode == "file":
+        global_output_dir = os.path.join(img_folder, 'contact_output')
+        os.makedirs(global_output_dir, exist_ok=True)
 
 
     ######################################### Prediciting Object Contact #########################################
-    if args.contact_type == 'oafford' or args.contact_type == 'ocontact':
+    if 'oafford' in args.contact_type or 'ocontact' in args.contact_type:
         print(f'-------> Predicting object contact')
+        
+        # Object contact always uses folder-based structure
+        if args.input_mode == "file":
+            print("Warning: Object contact requires folder-based structure. Switching to folder mode.")
+            args.input_mode = "folder"
+            # Re-process image paths for folder mode
+            llava_image_paths = []
+            for img_sample_folder in sorted(os.listdir(img_folder)):
+                folder_path = os.path.join(img_folder, img_sample_folder)
+                if os.path.isdir(folder_path):
+                    llava_image_paths.append(os.path.join(folder_path, f'{img_sample_folder}.jpg'))
+        
         camera_params_objects = OBJS_VIEW_DICT[model.config.oC_sam_view_type]['cam_params']
         view_names = list(camera_params_objects.keys())
         cam_params = [normalize_cam_params(camera_params_objects[view]) for view in view_names]
@@ -191,6 +221,8 @@ def main(args):
             for llava_image_path in llava_image_paths:
                 object_name = llava_image_path.split('/')[-1].split('__')[0].lower()
                 prompts.append(base_prompt.format(class_name=object_name))
+                
+                # Folder-based: sam_inp_objs in same folder as image
                 sam_base_folder = os.path.dirname(llava_image_path) + '/sam_inp_objs'
                 
                 # Check if sam_inp_objs folder exists, if not generate it  
@@ -215,7 +247,7 @@ def main(args):
             "Number of prompts, llava images and sam images must be same"
 
     ######################################### Prediciting Human Contact #########################################
-    elif args.contact_type == 'hcontact':
+    elif 'hcontact' in args.contact_type:
         print(f'-------> Predicting human contact')
         camera_params_humans = HUMAN_VIEW_DICT[model.config.hC_sam_view_type]['cam_params']
         view_names = list(camera_params_humans.keys())
@@ -244,7 +276,11 @@ def main(args):
     for prompt, llava_image_path, sam_image_path, overlay_sam_path, lift2d_dict_path in \
                             zip(prompts, llava_image_paths, sam_image_paths, overlay_sam_paths, lift2d_dict_paths): 
 
-        args.vis_save_path = os.path.dirname(llava_image_path) + '/contact_output'
+        # Set output path based on input mode
+        if args.input_mode == "folder":
+            args.vis_save_path = os.path.dirname(llava_image_path) + '/contact_output'
+        else:
+            args.vis_save_path = global_output_dir
         os.makedirs(args.vis_save_path, exist_ok=True)
 
         conv = conversation_lib.conv_templates[args.conv_type].copy()
@@ -322,13 +358,21 @@ def main(args):
         pred_contact_3d = output["pred_contact_3d"].detach()
         print(f'---> Num of non-zero contact vertices: {pred_contact_3d[pred_contact_3d != 0].shape[0]}')
 
+        # Determine save path for vertices based on input mode
+        if args.input_mode == "folder":
+            vertices_save_dir = os.path.dirname(llava_image_path)
+        else:
+            vertices_save_dir = args.vis_save_path
+        
+        fname_base = llava_image_path.split("/")[-1].split(".")[0]
+
         if args.contact_type == 'hcontact':
             pred_contact_3d_smplx = convert_contacts(pred_contact_3d, smpl_to_smlpx_mapping)
-            np.savez(f'{os.path.dirname(llava_image_path)}/hcontact_vertices.npz', \
+            np.savez(f'{vertices_save_dir}/{fname_base}_hcontact_vertices.npz', \
                     pred_contact_3d_smplh=pred_contact_3d.cpu(), pred_contact_3d_smplx=pred_contact_3d_smplx.cpu())
             
             # Process SMPLX mesh with contact vertices
-            output_smplx_path = os.path.join(args.vis_save_path, f'smplx_body_with_hcontacts.obj')
+            output_smplx_path = os.path.join(args.vis_save_path, f'{fname_base}_smplx_body_with_hcontacts.obj')
             process_smplx_mesh_with_contacts(
                 pred_contact_3d_smplx, 
                 output_smplx_path,
@@ -336,12 +380,14 @@ def main(args):
                 gender='neutral'
             )
         else:
-            np.savez(f'{os.path.dirname(llava_image_path)}/oafford_vertices.npz', pred_contact_3d=pred_contact_3d.cpu())
+            np.savez(f'{vertices_save_dir}/{fname_base}_oafford_vertices.npz', pred_contact_3d=pred_contact_3d.cpu())
             
             # Process object mesh with contact vertices for ocontact/oafford
+            # Object contact always uses folder-based structure
             obj_mesh_path = os.path.join(os.path.dirname(llava_image_path), 'object_mesh.obj')
+                
             if os.path.exists(obj_mesh_path):
-                output_obj_path = os.path.join(args.vis_save_path, f'object_mesh_with_contacts_{args.contact_type}.obj')
+                output_obj_path = os.path.join(args.vis_save_path, f'{fname_base}_object_mesh_with_contacts_{args.contact_type}.obj')
                 process_object_mesh_with_contacts(
                     obj_mesh_path, 
                     pred_contact_3d[0], 
@@ -349,7 +395,7 @@ def main(args):
                     contact_threshold=0.5
                 )
             else:
-                print(f'Warning: object_mesh.obj not found at {obj_mesh_path}')
+                print(f'Warning: object mesh not found at {obj_mesh_path}')
         
         # Decode the output text
         output_ids = output_ids[0][output_ids[0] != IMAGE_TOKEN_INDEX]
@@ -400,11 +446,37 @@ def main(args):
         # Save concatenated image
         fname = llava_image_path.split("/")[-1].split(".")[0]
         model_name = args.version.split("/")[-1]
-        concat_save_path = f'{args.vis_save_path}/{model_name}_{fname}_{args.contact_type}_concat.jpg'
-        cv2.imwrite(concat_save_path, grid)
-        print("Concatenated image saved at: {}".format(concat_save_path))
-
-        shutil.copy(llava_image_path, args.vis_save_path)  
+        
+        if args.input_mode == "file" and "hcontact" in args.contact_type:
+            # For file mode with hcontact, create combined image with input and grid
+            input_image = cv2.imread(llava_image_path)
+            input_h, input_w = input_image.shape[:2]
+            grid_h, grid_w = grid.shape[:2]
+            
+            # Resize input image to match grid height
+            if input_h != grid_h:
+                aspect_ratio = input_w / input_h
+                new_width = int(grid_h * aspect_ratio)
+                input_image_resized = cv2.resize(input_image, (new_width, grid_h))
+            else:
+                input_image_resized = input_image
+                new_width = input_w
+            
+            # Create combined image: input on left, grid on right
+            combined_width = new_width + grid_w
+            combined_image = np.zeros((grid_h, combined_width, 3), dtype=np.uint8)
+            combined_image[:, :new_width] = input_image_resized
+            combined_image[:, new_width:] = grid
+            
+            combined_save_path = f'{args.vis_save_path}/{model_name}_{fname}_{args.contact_type}_combined.jpg'
+            cv2.imwrite(combined_save_path, combined_image)
+            print("Combined image saved at: {}".format(combined_save_path))
+        else:
+            # Original behavior for folder mode or object contact
+            concat_save_path = f'{args.vis_save_path}/{model_name}_{fname}_{args.contact_type}_concat.jpg'
+            cv2.imwrite(concat_save_path, grid)
+            print("Concatenated image saved at: {}".format(concat_save_path))
+            shutil.copy(llava_image_path, args.vis_save_path)  
 
 if __name__ == "__main__":
     main(sys.argv[1:])
