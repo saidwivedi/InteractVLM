@@ -1,7 +1,7 @@
 <h1 align="center">InteractVLM: 3D Interaction Reasoning from 2D Foundational Models</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/CVPR-2025-blue" alt="CVPR 2025">
+  <img src="https://img.s<sup>†</sup> *We use Azure OpenAI GPT-4o image model to generate HOI-VQA for DAMON, LEMON and PIAD images. The script for calling Azure OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response).*ields.io/badge/CVPR-2025-blue" alt="CVPR 2025">
 </p>
 
 <div align="center"> 
@@ -107,7 +107,7 @@
     </tr>
     <tr>
       <td>4</td>
-      <td><code>interactvlm-joint-reconstruction</code><sup>#</sup></td>
+      <td><code>interactvlm-joint-reconstruction</code><sup>*</sup></td>
       <td>
         <img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"> <img src="https://img.shields.io/badge/ocontact-yellow" alt="ocontact">
       </td>
@@ -118,32 +118,24 @@
         <a href="https://rich.is.tue.mpg.de">RICH</a> +  
         <a href="https://yyvhang.github.io/LEMON/">LEMON-OBJ</a> + 
         <a href="https://yyvhang.github.io/publications/IAG/index.html">PIAD</a> + 
-        <a href="https://pico.is.tue.mpg.de">PICO</a>
+        <a href="https://pico.is.tue.mpg.de">PICO</a> + 
+        <a href="https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response/README.md">HOI-VQA</a><sup>#</sup>
         </sub>
       </td>
       <td>Single Model for Joint 3D Human Object Contact Estimation</td>
       <td>
-        <img src="https://img.shields.io/badge/🔄_Coming_Soon-orange" alt="Coming Soon">
+        <img src="https://img.shields.io/badge/✅_Available-green" alt="Available">
       </td>
     </tr>
   </tbody>
 </table>
 </div>
 
-<sup>#</sup> *The `interactvlm-joint-reconstruction` model will be trained with our new **[PICO Dataset (CVPR 2025)](https://pico.is.tue.mpg.de)**, which enables accurate 3D object contact estimation unlike object affordance using **LEMON-OBJ** and **PIAD** dataset.*
+<sup>*</sup> *The `interactvlm-joint-reconstruction` model is trained with our new **[PICO Dataset (CVPR 2025)](https://pico.is.tue.mpg.de)**, which enables accurate 3D object contact estimation unlike object affordance using **LEMON-OBJ** and **PIAD** dataset.*
+
+<sup>#</sup> *We use ChatGPT-4o image model to generate HOI-VQA for DAMON, LEMON and PIAD images. The script for calling OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response/).*
 
 ---
-
-## 📋 Code Release Status
-
-### ✅ **Released**
-- **3D Human Contact Estimation** - Training, evaluation, and demo code available
-- **3D Object Contact/Affordance Estimation** - Training, evaluation, and demo code available
-
-### 📅 **Pending**
-- **Object Shape Retrieval from Single Image** - Code release pending
-- **Optimization Pipeline for Joint Reconstruction** - Code release pending
-
 
 ## ⚙️ Installation
 
@@ -291,6 +283,16 @@ bash scripts/run_prepare_weights.sh 0
 # Evaluate the model on either DAMON or PIAD. Adjust the congfiguration accordingly
 bash scripts/run_eval.sh
 ```
+
+## 📋 Code Release Status
+
+### ✅ **Released**
+- **3D Human Contact Estimation** - Training, evaluation, and demo code available
+- **3D Object Contact/Affordance Estimation** - Training, evaluation, and demo code available
+
+### 📅 **Pending**
+- **Object Shape Retrieval from Single Image** - Code release pending
+- **Optimization Pipeline for Joint Reconstruction** - Code release pending
 
 ## 🙏 Acknowledgements
 
