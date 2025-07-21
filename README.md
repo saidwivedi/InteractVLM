@@ -107,7 +107,17 @@
     </tr>
     <tr>
       <td>4</td>
-      <td><code>interactvlm-joint-reconstruction</code><sup>*</sup></td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-2d-hcontact.zip"><code>interactvlm-2d-hcontact</code></a></td>
+      <td><img src="https://img.shields.io/badge/h2dcontact-teal" alt="h2dcontact"></td>
+      <td><sub>Extended <a href="https://github.com/dvlab-research/LISA">LISA</a> by projecting <a href="https://deco.is.tue.mpg.de">DAMON</a> contact on images</sub></td>
+      <td>2D Human Contact Segmentation via Referring Segmentation</td>
+      <td>
+        <img src="https://img.shields.io/badge/✅_Available-green" alt="Available">
+      </td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-joint-reconstruction.zip"><code>interactvlm-joint-reconstruction</code></a></td>
       <td>
         <img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"> <img src="https://img.shields.io/badge/ocontact-yellow" alt="ocontact">
       </td>
@@ -133,7 +143,7 @@
 
 <sup>*</sup> *The `interactvlm-joint-reconstruction` model is trained with our new **[PICO Dataset (CVPR 2025)](https://pico.is.tue.mpg.de)**, which enables accurate 3D object contact estimation unlike object affordance using **LEMON-OBJ** and **PIAD** dataset.*
 
-<sup>#</sup> *We use ChatGPT-4o image model to generate HOI-VQA for DAMON, LEMON and PIAD images. The script for calling OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response/).*
+<sup>#</sup> *We use GPT-4o image model to generate HOI-VQA for DAMON, LEMON and PIAD images. The script for calling OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response/).*
 
 ---
 
@@ -219,6 +229,9 @@ Run the demo on your own images with either human or object interaction estimati
 # For 3D human contact estimation
 bash scripts/run_demo.sh hcontact data/demo_samples folder
 
+# For 2D human contact segmentation
+bash scripts/run_demo.sh h2dcontact data/demo_samples file
+
 # For 3D object affordance estimation  
 bash scripts/run_demo.sh oafford data/demo_samples folder
 ```
@@ -227,14 +240,18 @@ bash scripts/run_demo.sh oafford data/demo_samples folder
 
 - **Human Contact Demo**: The canonical human mesh and rendered input are already provided. Simply run the script to estimate 3D contact points on human bodies. We now also support human contact estimation with scene (e.g. ground or undefined objects) with the latest released model. Download the latest model using `hcontact-wScene` argument in `fetch_data.sh` and use the same argument while running the demo script. The object name in the image filename serves as the query object for contact estimation (e.g., "bottle" or "chair"). To estimate contact with the scene or ground, use "scene" as the query or prefix the filename with "scene".
 
+- **2D Human Contact Demo**: Performs 2D contact segmentation directly on the input image using referring segmentation. This extends LISA's capabilities for human-object contact detection in 2D space. The object name in the image filename serves as the query object for contact estimation.
+
 - **Object Affordance Demo**: The code expects an object mesh as input. The script will automatically render multiple views of the object for affordance prediction.
 
 **Input Modes:**
 
 The demo supports two input structures:
 
-1. **Folder-based mode** (default): Each sample in its own folder
-2. **File-based mode**: All samples as files in a single folder. E.g. Estimating human contact for video frames (**human contact only**)
+1. **Folder-based mode** (default): Each sample in its own folder (required for 3D human contact and object affordance)
+2. **File-based mode**: All samples as files in a single folder. Supported for:
+   - **2D Human Contact** (`h2dcontact`): Direct segmentation on input images
+   - **3D Human Contact** (`hcontact`): Estimating human contact for video frames
    
 **Sample Data**: The `data/demo_samples/` directory contains ready-to-use samples for testing both human contact and object affordance estimation. One should get the following results:
 
