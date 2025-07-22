@@ -1,7 +1,7 @@
 <h1 align="center">InteractVLM: 3D Interaction Reasoning from 2D Foundational Models</h1>
 
 <p align="center">
-  <img src="https://img.s<sup>†</sup> *We use Azure OpenAI GPT-4o image model to generate HOI-VQA for DAMON, LEMON and PIAD images. The script for calling Azure OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response).*ields.io/badge/CVPR-2025-blue" alt="CVPR 2025">
+  <img src="https://img.shields.io/badge/CVPR-2025-blue" alt="CVPR 2025">
 </p>
 
 <div align="center"> 
