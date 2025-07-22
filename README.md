@@ -117,7 +117,7 @@
     </tr>
     <tr>
       <td>5</td>
-      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-joint-reconstruction.zip"><code>interactvlm-joint-reconstruction</code></a></td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-ocontact.zip"><code>interactvlm-3d-hcontact-ocontact</code></a></td>
       <td>
         <img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"> <img src="https://img.shields.io/badge/ocontact-yellow" alt="ocontact">
       </td>

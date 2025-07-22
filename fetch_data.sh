@@ -46,6 +46,8 @@ DATA_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=d
 HCONTACT_DAMON_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-damon.zip'
 HCONTACT_DAMON_LEMON_RICH_WSCENE_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-wScene-damon-lemon-rich.zip'
 OAFFORD_LEMON_PIAD_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-oafford-lemon-piad.zip'
+H2DCONTACT_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-2d-hcontact.zip'
+HCONTACT_OCONTACT_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-ocontact.zip'
 DAMON_DATASET_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=damon.tar.gz'
 
 # Check command line arguments
@@ -55,6 +57,7 @@ if [ $# -eq 0 ]; then
     download_and_unzip "$DATA_URL"
     download_and_unzip "$HCONTACT_DAMON_MODEL_URL"
     download_and_unzip "$OAFFORD_LEMON_PIAD_MODEL_URL"
+    download_and_unzip "$H2DCONTACT_MODEL_URL"
 elif [ "$1" = "damon-dataset" ]; then
     # damon-dataset argument provided - download only that file
     echo "Downloading DAMON dataset only..."
@@ -63,10 +66,21 @@ elif [ "$1" = "hcontact-wScene" ]; then
     # hcontact-wScene argument provided - download the specific model
     echo "Downloading Human Contact with Scene model..."
     download_and_unzip "$HCONTACT_DAMON_LEMON_RICH_WSCENE_MODEL_URL"
+elif [ "$1" = "h2dcontact" ]; then
+    # h2dcontact argument provided - download the specific model
+    echo "Downloading 2D Human Contact model..."
+    download_and_unzip "$H2DCONTACT_MODEL_URL"
+elif [ "$1" = "joint-reconstruction" ]; then
+    # joint-reconstruction argument provided - download the specific model
+    echo "Downloading Joint Human-Object Contact model..."
+    download_and_unzip "$HCONTACT_OCONTACT_MODEL_URL"
 else
     echo "Unknown argument: $1"
-    echo "Usage: $0 [damon-dataset]"
-    echo "  No argument: Downloads all model files (data.zip, interactvlm-3d-hcontact-damon.zip, interactvlm-3d-oafford-lemon-piad.zip)"
+    echo "Usage: $0 [damon-dataset|hcontact-wScene|h2dcontact|joint-reconstruction]"
+    echo "  No argument: Downloads all model files (data.zip, interactvlm-3d-hcontact-damon.zip, interactvlm-3d-oafford-lemon-piad.zip, interactvlm-2d-hcontact.zip)"
     echo "  damon-dataset: Downloads only damon.tar.gz dataset"
+    echo "  hcontact-wScene: Downloads interactvlm-3d-hcontact-wScene-damon-lemon-rich.zip"
+    echo "  h2dcontact: Downloads interactvlm-2d-hcontact.zip"
+    echo "  joint-reconstruction: Downloads interactvlm-3d-hcontact-ocontact.zip"
     exit 1
 fi
