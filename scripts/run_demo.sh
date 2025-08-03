@@ -38,6 +38,14 @@ case $contact_type in
         model_path="./trained_models/interactvlm-3d-oafford-lemon-piad"
         echo "Running object affordance demo..."
         ;;
+    "hcontact-ocontact")
+        model_path="./trained_models/interactvlm-3d-hcontact-ocontact"
+        echo "Running joint human-object contact demo..."
+        ;;
+    "h2dcontact")
+        model_path="./trained_models/interactvlm-2d-hcontact"
+        echo "Running 2D human contact demo..."
+        ;;
     *)
         echo "Error: Invalid contact type '$contact_type'"
         echo "Valid options are: hcontact, oafford"

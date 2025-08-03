@@ -266,6 +266,30 @@ OBJS_VIEW_DICT = {
                          }
                         
             },
+    '4MV-Z_HM_BM-L': {'order': 'fix',
+                      'grid_size': np.array([4, 1, 1]),
+                      'mask_size': 1024,
+                      'names': np.array([[['frontleft']], 
+                                        [['frontright']],
+                                        [['backleft',]],
+                                        [['backright']]]),
+                      'ignore_keywords': [],
+                      'mesh_folder': 'lowpoly_mesh_0507',
+                      'folder': 'rendered_points_heatmap_1025',
+                      'cam_params': {
+                            'frontleft':  [2., 45., 315., 0., 0.],
+                            'frontright': [2., 45., 45., 0., 0.],
+                            'backleft':   [2., 330., 135., 0., 0.],
+                            'backright':  [2., 330., 225., 0., 0.]
+                     },
+                      'mesh_cam_params': {
+                            'frontleft':  [1.5, 45., 315., 0., 0.],
+                            'frontright': [1.5, 45., 45., 0., 0.],
+                            'backleft':   [1.5, 330., 135., 0., 0.],
+                            'backright':  [1.5, 330., 225., 0., 0.]
+                         }
+                        
+            },
     '10MV-Z_HM': {'order': 'fix',
                   'grid_size': np.array([10, 1, 1]),
                   'mask_size': 1024,
@@ -285,56 +309,6 @@ OBJS_VIEW_DICT = {
                     'left':       [2, 0, 270, 0., 0.0],
                     'right':      [2, 0, 90, 0., 0.0],
                   },
-                },
-    '10MV-Z_HM1': {'order': 'fix',
-                  'grid_size': np.array([10, 1, 1]),
-                  'mask_size': 1024,
-                  'folder': 'rendered_points_heatmap_1102',
-                  'names': np.array([[['frontleft', 'frontright', 'top', 'front', 'left'],
-                                       ['backleft', 'backright', 'bottom', 'back', 'right']]]),
-                  'ignore_keywords': [],
-                  'cam_params': {
-                    'frontleft':  [2., 45., 315., 0., 0.],
-                    'frontright': [2., 45., 45., 0., 0.],
-                    'backleft':   [2., 330., 135., 0., 0.],
-                    'backright':  [2., 330., 225., 0., 0.],
-                    'top':        [2, 90, 0, 0., 0.],
-                    'bottom':     [2, 270, 0, 0., 0.0],
-                    'front':      [2, 0, 0, 0., 0.0],
-                    'back':       [2, 0, 180, 0., 0.0],
-                    'left':       [2, 0, 270, 0., 0.0],
-                    'right':      [2, 0, 90, 0., 0.0],
-                  },
-                },
-    '10MV-Z_HM2': {'order': 'fix',
-                  'grid_size': np.array([10, 1, 1]),
-                  'mask_size': 1024,
-                  'folder': 'rendered_points_heatmap_AP1K0_1104',
-                  'names': np.array([[['frontleft', 'frontright', 'top', 'front', 'left'],
-                                       ['backleft', 'backright', 'bottom', 'back', 'right']]]),
-                  'ignore_keywords': [],
-                  'cam_params': {
-                    'frontleft':  [2., 45., 315., 0., 0.],
-                    'frontright': [2., 45., 45., 0., 0.],
-                    'backleft':   [2., 330., 135., 0., 0.],
-                    'backright':  [2., 330., 225., 0., 0.],
-                    'top':        [2, 90, 0, 0., 0.],
-                    'bottom':     [2, 270, 0, 0., 0.0],
-                    'front':      [2, 0, 0, 0., 0.0],
-                    'back':       [2, 0, 180, 0., 0.0],
-                    'left':       [2, 0, 270, 0., 0.0],
-                    'right':      [2, 0, 90, 0., 0.0],
-                  },
-                },
-    '10MV-XY_Rand': {'order': 'rand',
-                    'grid_size': np.array([1, 2, 2]),
-                    'mask_size': 512,
-                    'folder': 'rendered_points_0917',
-                    'names': np.array([[['frontleft', 'frontright', 'top', 'front', 'left'],
-                                       ['backleft', 'backright', 'bottom', 'back', 'right']]]),
-                    'ignore_keywords': ['Refrigerator', 'Baseballbat'],
-                    'cam_params': {'frontleft': None, 'frontright': None, 'top': None, 'front': None, 'left': None,
-                                      'backleft': None, 'backright': None, 'bottom': None, 'back': None, 'right': None}
                 },
 }
 
@@ -361,7 +335,7 @@ HUMAN_VIEW_DICT = {
                         'bottomback':  [2., 315., 135, 0., 0.3]
                     }
                 }, 
-    '4MV-Z_Vitru_wScene':
+    '4MV-Z_Vitru_FootGround':
                     {'order': 'fix',
                     'num_vertices': 6890,
                     'grid_size': np.array([4, 1, 1]),
