@@ -117,7 +117,7 @@
     </tr>
     <tr>
       <td>5</td>
-      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-ocontact.zip"><code>interactvlm-3d-hcontact-ocontact</code></a></td>
+      <td><a href="https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-ocontact.zip"><code>interactvlm-3d-hcontact-ocontact<sup>*</sup></code></a></td>
       <td>
         <img src="https://img.shields.io/badge/hcontact-blue" alt="hcontact"> <img src="https://img.shields.io/badge/ocontact-yellow" alt="ocontact">
       </td>
@@ -141,9 +141,9 @@
 </table>
 </div>
 
-<sup>*</sup> *The `interactvlm-joint-reconstruction` model is trained with our new **[PICO Dataset (CVPR 2025)](https://pico.is.tue.mpg.de)**, which enables accurate 3D object contact estimation unlike object affordance using **LEMON-OBJ** and **PIAD** dataset.*
+<sup>*</sup> *The `interactvlm-3d-hcontact-ocontact` model is trained with our new **[PICO Dataset (CVPR 2025)](https://pico.is.tue.mpg.de)**, which enables accurate 3D object contact estimation unlike object affordance using **LEMON-OBJ** and **PIAD** dataset.*
 
-<sup>#</sup> *We use GPT-4o image model to generate HOI-VQA for DAMON, LEMON and PIAD images. The script for calling OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response/).*
+<sup>#</sup> *We use GPT-4o image model to generate HOI-VQA dataset for training using DAMON, LEMON and PIAD images. The script for calling OpenAI API, raw data and preprocessing scripts are [here](https://github.com/saidwivedi/InteractVLM/tree/main/preprocess_data/generate_gpt4o_response/).*
 
 ---
 
@@ -242,7 +242,7 @@ bash scripts/run_demo.sh oafford data/demo_samples folder
 
 - **2D Human Contact Demo**: Performs 2D contact segmentation directly on the input image using referring segmentation. This extends LISA's capabilities for human-object contact detection in 2D space. The object name in the image filename serves as the query object for contact estimation.
 
-- **Object Affordance Demo**: The code expects an object mesh as input. The script will automatically render multiple views of the object for affordance prediction.
+- **Object Affordance Demo**: Can work with either object meshes or single images. For single images, first use our [Object Retrieval](https://github.com/saidwivedi/Object_Retrieval) pipeline to retrieve the 3D object shape and save it as `object_mesh.obj`, then the script will render multiple views for affordance prediction.
 
 **Input Modes:**
 
@@ -306,9 +306,9 @@ bash scripts/run_eval.sh
 ### ✅ **Released**
 - **3D Human Contact Estimation** - Training, evaluation, and demo code available
 - **3D Object Contact/Affordance Estimation** - Training, evaluation, and demo code available
+- **Object Shape Retrieval from Single Image** - Code Available at [Object_Retrieval](https://github.com/saidwivedi/Object_Retrieval)
 
 ### 📅 **Pending**
-- **Object Shape Retrieval from Single Image** - Code release pending
 - **Optimization Pipeline for Joint Reconstruction** - Code release pending
 
 ## 🙏 Acknowledgements
