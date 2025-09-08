@@ -315,7 +315,7 @@ bash scripts/run_eval.sh
 - **Object Shape Retrieval from Single Image** - Code available at [Object_Retrieval](https://github.com/saidwivedi/Object_Retrieval)
 - **Optimization Framework for Joint Reconstruction** - Code available at [`optim/`](optim/README.md)
 
-### 📅 **Pending**
+<!-- ### 📅 **Pending** -->
 
 ## 🙏 Acknowledgements
 
