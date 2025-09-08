@@ -1,0 +1,38 @@
+out_root: output/fitting/           # * Output folder
+
+# * Logging
+log_out: stdout                     # * file or stdout for logging output
+print_every: 10                     # * Print loss string to a file every n iterations; Only works with log_out: file
+save_init: True                     # * Save initial state
+log_video: True                     # * Log .mp4 video of fitting
+log_meshes: False                   # * Log obj meshes
+# * Hooks
+early_stop: False                   # * Stop when np.abs(prev_loss-min_loss) < 1e-5
+
+# * Initialization
+init:
+  translation_hum_centroid: True    # * Translate the object to human centroid
+  max_iter: 70                      # * Max iterations for stage 1
+  icp:
+    run: True
+    filter_contacts: [True,90,-90]  # * Filter out contacts if the angle difference is less than param[1] degrees
+    est_scale: False
+    max_iter: 10
+
+# * Optim
+optim_name: adam                    # * adam, sgd
+max_iter: 250                       # * Max iterations for optimization
+vars: [pose]                        # * Choose from: pose, scale
+
+# * Losses
+en_scale_loss: False
+loss_weights:
+  mask_loss: 
+    w: 5.0e+0
+    kick_in: 0
+  centroid_loss: 
+    w: 1.e-4
+    kick_in: 0
+  contact_loss: 
+    w: 1.0e+1
+    kick_in: 0

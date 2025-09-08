@@ -28,5 +28,5 @@ pillow_heif
 git+https://github.com/facebookresearch/pytorch3d.git@stable
 timm
 git+https://github.com/vguzov/videoio
-pyrender
 wandb
+omegaconf
