@@ -176,6 +176,7 @@
 
 5. **Install dependencies**:
    ```bash
+   micromamba install -c conda-forge gcc_linux-64=12.2.0 gxx_linux-64=12.2.0 ffmpeg x264 -y 
    pip install -r requirements.txt
    pip install flash-attn --no-build-isolation
    DS_BUILD_FUSED_ADAM=1 pip install deepspeed==0.15.1
@@ -202,6 +203,7 @@ InteractVLM/
 ├── 📁 trained_models/                # Trained models
 ├── 📄 train.py                       # Main training script
 ├── 📄 evaluate.py                    # Main evaluation script
+├── 📄 optim/fit.py                   # Main optimization script
 ├── 📄 run_demo.py                    # Run Demo
 └── 📄 requirements.txt               # Python dependencies
 ```
@@ -234,7 +236,11 @@ bash scripts/run_demo.sh h2dcontact data/demo_samples file
 
 # For 3D object affordance estimation  
 bash scripts/run_demo.sh oafford data/demo_samples folder
+
+# For joint 3D fitting (human + object)
+bash scripts/run_optim.sh 
 ```
+For joint reconstruction, see [`optim/`](optim/README.md) module.
 
 **Demo Requirements:**
 
@@ -306,10 +312,10 @@ bash scripts/run_eval.sh
 ### ✅ **Released**
 - **3D Human Contact Estimation** - Training, evaluation, and demo code available
 - **3D Object Contact/Affordance Estimation** - Training, evaluation, and demo code available
-- **Object Shape Retrieval from Single Image** - Code Available at [Object_Retrieval](https://github.com/saidwivedi/Object_Retrieval)
+- **Object Shape Retrieval from Single Image** - Code available at [Object_Retrieval](https://github.com/saidwivedi/Object_Retrieval)
+- **Optimization Framework for Joint Reconstruction** - Code available at [`optim/`](optim/README.md)
 
 ### 📅 **Pending**
-- **Optimization Pipeline for Joint Reconstruction** - Code release pending
 
 ## 🙏 Acknowledgements
 
@@ -336,13 +342,12 @@ InteractVLM builds upon several excellent open-source projects and datasets:
 - **[LEMON](https://yyvhang.github.io/LEMON/)**, **[DECO](https://deco.is.tue.mpg.de)**, **[PIAD](https://github.com/yyvhang/IAGNet)**, **[PICO](https://pico.is.tue.mpg.de)** and **[RICH](https://rich.is.tue.mpg.de)** - For human contact and object affordance data
 - **[Blendify](https://github.com/ptrvilya/blendify/)** - For rendering
 
-### Optimization Pipeline
-Our optimization pipeline integrates the following repositories:
+### Optimization Framework
+Our optimization framework integrates the following repositories (see [`optim/`](optim/README.md) for details):
 
 - **[OpenShape](https://github.com/Colin97/OpenShape_code)** - For object shape retrieval
 - **[OSX](https://github.com/IDEA-Research/OSX)** - For SMPLX human pose estimation  
 - **[Grounded-SAM](https://github.com/IDEA-Research/Grounded-Segment-Anything)** - For object detection and segmentation
-- **[Depth Pro](https://github.com/apple/ml-depth-pro)** - For depth estimation
 
 
 

@@ -49,6 +49,7 @@ OAFFORD_LEMON_PIAD_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain
 H2DCONTACT_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-2d-hcontact.zip'
 HCONTACT_OCONTACT_MODEL_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=interactvlm-3d-hcontact-ocontact.zip'
 DAMON_DATASET_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=damon.tar.gz'
+OPTIM_DEMO_DATA_URL='https://download.is.tue.mpg.de/download.php?domain=interactvlm&sfile=optim_data.zip'
 
 # Check command line arguments
 if [ $# -eq 0 ]; then
@@ -74,9 +75,13 @@ elif [ "$1" = "joint-reconstruction" ]; then
     # joint-reconstruction argument provided - download the specific model
     echo "Downloading Joint Human-Object Contact model..."
     download_and_unzip "$HCONTACT_OCONTACT_MODEL_URL"
+elif [ "$1" = "optim-demo-data" ]; then
+    # optim-demo-data argument provided - download the specific demo data
+    echo "Downloading Optimization Demo Data..."
+    download_and_unzip "$OPTIM_DEMO_DATA_URL"
 else
     echo "Unknown argument: $1"
-    echo "Usage: $0 [damon-dataset|hcontact-wScene|h2dcontact|joint-reconstruction]"
+    echo "Usage: $0 [damon-dataset|hcontact-wScene|h2dcontact|joint-reconstruction|optim-demo-data]"
     echo "  No argument: Downloads all model files (data.zip, interactvlm-3d-hcontact-damon.zip, interactvlm-3d-oafford-lemon-piad.zip, interactvlm-2d-hcontact.zip)"
     echo "  damon-dataset: Downloads only damon.tar.gz dataset"
     echo "  hcontact-wScene: Downloads interactvlm-3d-hcontact-wScene-damon-lemon-rich.zip"
