@@ -234,14 +234,19 @@ class HContactSegDataset(BaseContactSegDataset):
         elif self.question_type == 'parts':
             self.answer_list = HCONTACT_PARTS_ANSWER_LIST
             self.short_question_list = HCONTACT_PARTS_QUESTION_LIST
-        
+
+        self.body_part_dropout_prob = contact_dataset_config.get('hC_body_part_dropout_prob', 0.0) if is_train else 0.0
+
         base_token_type = contact_dataset_config['token_type'].replace('-DifDe', '')
         if base_token_type == 'Gen-Int':
-            self.answer_list = [ans.replace('HTOKEN', 'ISEG') for ans in self.answer_list]
+            seg_token = 'ISEG'
         elif base_token_type == 'Gen-Hu-Obj':
-            self.answer_list = [ans.replace('HTOKEN', 'HSEG') for ans in self.answer_list]
+            seg_token = 'HSEG'
         else:
-            self.answer_list = [ans.replace('HTOKEN', 'SEG') for ans in self.answer_list]
+            seg_token = 'SEG'
+        self.answer_list = [ans.replace('HTOKEN', seg_token) for ans in self.answer_list]
+        self.simple_answer_list = [ans.replace('HTOKEN', seg_token) for ans in HCONTACT_ANSWER_LIST]
+        self.simple_question_list = HCONTACT_QUESTION_LIST
             
         self.sam_dict, self.data2list, self.data2classes, self.ds_size = {}, {}, {}, {}
 
@@ -330,7 +335,14 @@ class HContactSegDataset(BaseContactSegDataset):
             print(f'Warning: No contact pixels in the mask for {llava_image_path}')
             return self.__getitem__(random.randint(0, self.samples_per_epoch - 1))
 
-        conversations, questions = self.generate_h_conversations(sampled_classes, body_parts)
+        if self.is_train and self.body_part_dropout_prob > 0 and random.random() < self.body_part_dropout_prob:
+            orig_answer_list, orig_question_list = self.answer_list, self.short_question_list
+            self.answer_list = self.simple_answer_list
+            self.short_question_list = self.simple_question_list
+            conversations, questions = self.generate_h_conversations(sampled_classes, None)
+            self.answer_list, self.short_question_list = orig_answer_list, orig_question_list
+        else:
+            conversations, questions = self.generate_h_conversations(sampled_classes, body_parts)
 
         cam_params = torch.stack(cam_params).float() 
         label = torch.from_numpy(label)

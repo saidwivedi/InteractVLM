@@ -90,12 +90,12 @@ def parse_args(args):
     parser.add_argument("--workers", default=4, type=int)
     parser.add_argument("--lr", default=0.0003, type=float)
     parser.add_argument("--ce_loss_weight", default=1.0, type=float)
-    parser.add_argument("--dice_loss_weight", default=0.5, type=float)
+    parser.add_argument("--dice_loss_weight", default=1.0, type=float)
     parser.add_argument("--bce_loss_weight", default=2.0, type=float)
     parser.add_argument("--hC_loss_weight", default=3.0, type=float)
     parser.add_argument("--oC_loss_weight", default=3.0, type=float)
-    parser.add_argument("--bce_loss_alpha", default=0.25, type=float)
-    parser.add_argument("--dice_loss_scale", default=1000, type=float)
+    parser.add_argument("--bce_loss_alpha", default=0.5, type=float)
+    parser.add_argument("--dice_loss_scale", default=1.0, type=float)
     parser.add_argument("--lora_alpha", default=16, type=int)
     parser.add_argument("--lora_dropout", default=0.05, type=float)
     parser.add_argument("--lora_target_modules", default="q_proj,v_proj", type=str)
@@ -133,6 +133,9 @@ def parse_args(args):
     parser.add_argument("--hC_mask_type", default='all_contact', type=str)
     parser.add_argument("--hC_question_type", default='simple', type=str)
     parser.add_argument("--hC_train_fraction", default=1.0, type=float)
+    parser.add_argument("--hC_body_part_dropout_prob", default=0.0, type=float)
+    parser.add_argument("--inference_type", default='forward', type=str,
+                        choices=['forward', 'generate'])
     # newly added configs
     parser.add_argument('--train_from_LISA', default=True, type=lambda x: bool(strtobool(x)))
     parser.add_argument('--train_from_LLAVA', default=False, type=lambda x: bool(strtobool(x)))
@@ -239,6 +242,7 @@ def main(args):
         "hC_mask_type": args.hC_mask_type,
         "hC_question_type": args.hC_question_type,
         "hC_train_fraction": args.hC_train_fraction,
+        "hC_body_part_dropout_prob": args.hC_body_part_dropout_prob,
         "token_type": args.token_type,
     }
 
@@ -428,11 +432,14 @@ def main(args):
 
         save_model = True
         if not args.no_eval:
+            current_scores_all = {}
             for val_ds, val_loader in val_loaders.items():
                 saved_results, giou, ciou, contact_metric = validate(val_loader, model_engine, epoch, loggers, args, val_ds)
                 if ('hcontact' in val_ds or 'oafford' in val_ds) and contact_metric > 0:
+                    current_scores_all[val_ds] = contact_metric
                     best_scores_all[val_ds] = max(contact_metric, best_scores_all[val_ds])
                 else:
+                    current_scores_all[val_ds] = giou
                     best_scores_all[val_ds] = max(giou, best_scores_all[val_ds])
                 ciou_scores_all[val_ds] = max(ciou, ciou_scores_all[val_ds])
 
@@ -442,7 +449,7 @@ def main(args):
             best_score = max(best_scores_all[imp_ds], best_score)
 
             if ('hcontact' in imp_ds or 'oafford' in imp_ds) and not is_best:
-                print(f"Skipping saving model -- Best score: {best_score}, current score: {best_scores_all[imp_ds]}")
+                print(f"Skipping saving model -- Best score: {best_score}, current score: {current_scores_all[imp_ds]}")
                 save_model = False
 
         if save_model:

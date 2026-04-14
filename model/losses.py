@@ -20,8 +20,8 @@ def uncertainty_penalty(uncertainty_map, penalty_weight=0.3):
 
 class CombinedLoss(nn.Module):
     def __init__(self, hCpredictor, oApredictor, oCpredictor,
-                 bce_loss_weight=2.0, bce_loss_alpha=0.25,
-                 dice_loss_weight=0.5, dice_loss_scale=1000,
+                 bce_loss_weight=2.0, bce_loss_alpha=0.5,
+                 dice_loss_weight=1.0, dice_loss_scale=1.0,
                  hC_loss_weight=3.0, oC_loss_weight=1.0,
                  use_uncertainty=False):
         super(CombinedLoss, self).__init__()
@@ -169,7 +169,8 @@ class CombinedLoss(nn.Module):
                 target_view = target_view[valid_mask]
 
                 if target_view.numel() == 0 or target_view.sum() == 0:
-                    return torch.tensor(0.0, device=inputs.device, dtype=inputs.dtype)
+                    losses.append(torch.tensor(0.0, device=inputs.device, dtype=inputs.dtype))
+                    continue
 
                 numerator = 2 * (input_view / scale * target_view).sum()
                 denominator = (input_view / scale).sum() + (target_view / scale).sum()
@@ -185,9 +186,6 @@ class CombinedLoss(nn.Module):
 
                 losses.append(view_loss)
             
-            total_loss = torch.stack(losses).mean()
-            if total_loss.item() == 0:
-                print(f"\nWarning: Zero dice loss detected - {mask_path}")
             return torch.stack(losses).mean()
         else:
             inputs = inputs.reshape(-1)
@@ -223,12 +221,8 @@ class HumanContact3DLoss(nn.Module):
         gt_3d_contacts = torch.stack([gt_3d_contacts[i].to(dtype) for i, mask in enumerate(hcontact_mask) if mask])
         
         pred_3d_contacts = self.predictor(seg_maps)
+        pred_3d_contacts = torch.clamp(pred_3d_contacts, 1e-6, 1.0 - 1e-6)
 
-        # Handle case where no vertices were selected in any view
-        if pred_3d_contacts.sum() == 0:
-            print("Warning: No vertices were selected in any view. Returning zero loss.")
-            return torch.tensor(0.0, device=device, dtype=dtype)
-        
         bce_loss = F.binary_cross_entropy(pred_3d_contacts, gt_3d_contacts, reduction='none')
         pt = torch.exp(-bce_loss)
         focal_loss = self.focal_alpha * (1-pt)**self.focal_gamma * bce_loss

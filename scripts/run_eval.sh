@@ -24,9 +24,9 @@ gpu_memory_in_gb=$(($gpu_memory / 1024))
 # Function to set configuration based on numerical argument
 set_configuration() {
   case $1 in
-    "hcontact-damon")
-      EXP_NAME="eval_damon_hcontact"
-      VERSION="trained_models/interactvlm-3d-hcontact-damon"
+    "hcontact-damon-fix")
+      EXP_NAME="eval_damon_hcontact_fix"
+      VERSION="trained_models/interactvlm-3d-hcontact-damon-fix"
       LOG_WANDB="False"
       VAL_DATASET="damon_hcontact"
       DISP_SIZE="128"

@@ -109,16 +109,16 @@ def get_contact_subset(contact_vertices, body_parts, threshold=0.1):
     
     return list(set(contact_subset))  # Return unique vertices only
 
-def generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=False):
+def generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=False, min_vertices=3):
     mask_list, render_list, pixel_to_vertices_map_list, bary_coords_list = [], [], [], []
 
     for idx, (save_str, camera_params) in enumerate(views_dict.items()):
         save_path = f'{out_dir}/{imgname[:-4]}_{save_str}.png'
         if os.path.exists(save_path):
             continue
-        
+
         mask, pixel_to_vertices_map, bary_coords = project_vertices_and_create_mask(
-            mesh, camera_params, contact_vertices, image_size=RENDER_IMG_SIZE)
+            mesh, camera_params, contact_vertices, image_size=RENDER_IMG_SIZE, min_vertices=min_vertices)
         
         cv2.imwrite(save_path, mask)
         
@@ -145,6 +145,8 @@ if __name__ == '__main__':
     parser.add_argument('--mask_type', type=str, default='objectwise', help='all contact or objectwise')
     parser.add_argument('--output_dir', type=str, default='test', help='output directory')
     parser.add_argument('--view_type', type=str, default='views4', help='view type')
+    parser.add_argument('--min_vertices', type=int, default=3,
+                        help='Min triangle-vertex count in contact required to mark a pixel (1, 2, or 3).')
     
     args = parser.parse_args()
 
@@ -206,7 +208,7 @@ if __name__ == '__main__':
                 os.makedirs(out_dir, exist_ok=True)
                 print(f'processing {idx}/{len(damon_list)} {imgname} | Contact vertices: {len(contact_vertices)} \nMissing: {missing_contact}')
                 # rgb_img.save(f'{out_dir}/{imgname}')
-                generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=debug)
+                generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=debug, min_vertices=args.min_vertices)
 
                 # Since DAMON does not have foot ground contact vertices, we create a separate mask for foot ground
                 if 'supporting' in obj:
@@ -219,7 +221,7 @@ if __name__ == '__main__':
                             os.makedirs(out_dir, exist_ok=True)
                             print(f'processing {idx}/{len(damon_list)} {imgname} with foot ground | Contact vertices: {len(contact_vertices_subset)}')
                             # rgb_img.save(f'{out_dir}/{imgname}')
-                            generate_human_mask(imgname, mesh, contact_vertices_subset, out_dir, views_dict, debug=debug)
+                            generate_human_mask(imgname, mesh, contact_vertices_subset, out_dir, views_dict, debug=debug, min_vertices=args.min_vertices)
 
         # create mask for all contact vertices
         else:
@@ -237,7 +239,7 @@ if __name__ == '__main__':
             os.makedirs(out_dir, exist_ok=True)
             print(f'processing {idx}/{len(damon_list)} {imgname} | Contact vertices: {len(contact_vertices)} \nMissing: {missing_contact}')
             # # rgb_img.save(f'{out_dir}/{imgname}')
-            generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=debug)
+            generate_human_mask(imgname, mesh, contact_vertices, out_dir, views_dict, debug=debug, min_vertices=args.min_vertices)
 
         total_valid_annotations += 1
 

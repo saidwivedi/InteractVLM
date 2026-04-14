@@ -46,7 +46,7 @@ class ModifiedSAM(nn.Module):
         if self.use_diff_decoder:
             if 'hcontact' in ds_name:
                 mask_decoder = self.human_mask_decoder
-            elif 'oafford' or 'ocontact' in ds_name:
+            elif 'oafford' in ds_name or 'ocontact' in ds_name:
                 mask_decoder = self.object_mask_decoder
             else:
                 mask_decoder = self.mask_decoder

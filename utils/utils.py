@@ -450,6 +450,10 @@ def log_images(loggers, idx, tag, input_dict, output_dict, global_step, disp_siz
     sam_img = torch.clamp((sam_img / 255.0), 0.0, 1.0)
     pred_mask = output_dict["pred_masks"][idx].float()
     gt_mask = output_dict["gt_masks"][idx].float()
+    if pred_mask.dim() == 4:
+        pred_mask = pred_mask[:, 0]
+    if gt_mask.dim() == 4:
+        gt_mask = gt_mask[:, 0]
     try:
         if pred_mask.shape[0] != 0:
             pred_mask = pred_mask[random_view].unsqueeze(0)

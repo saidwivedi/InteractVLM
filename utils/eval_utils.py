@@ -47,6 +47,8 @@ def get_segmentation_metrics(output_dict):
 
     intersection, union, acc_iou, num_masks = 0.0, 0.0, 0.0, 0
     for mask_i, output_i in zip(masks_list, output_list):
+        mask_i = mask_i.squeeze() if mask_i.dim() > 2 else mask_i
+        output_i = output_i.squeeze() if output_i.dim() > 2 else output_i
         intersection_i, union_i, _ = intersectionAndUnionGPU(
             output_i.contiguous().clone(), mask_i.contiguous(), 2,
         )
@@ -211,17 +213,27 @@ def get_o_affordance_metrics(contact_gt, contact_pred):
     return sim_avg, mae_avg, auc_avg, iou_avg, valid_samples
 
 def get_args_for_eval(args):
-    # log_folder = f'runs/{args.version.split("/")[-1]}'
     eval_args = args
     with open(f'{args.version}/pretrained_config.json', 'r') as file:
         pretrained_args = json.load(file, object_hook=lambda d: Config(d))
+    hf_config = {}
+    hf_config_path = f'{args.version}/config.json'
+    if os.path.exists(hf_config_path):
+        with open(hf_config_path, 'r') as file:
+            hf_config = json.load(file)
     args = pretrained_args
+    for key in ('hC_sam_view_type', 'hC_question_type', 'token_type',
+                'cam_encoder_type', 'multiview_cam_cond', 'multiview_channels',
+                'img_emb_len'):
+        if key in hf_config:
+            setattr(args, key, hf_config[key])
     print(f'args: {args}')
     args.local_rank = eval_args.local_rank
     args.version = eval_args.version
     args.log_wandb = eval_args.log_wandb
     args.val_dataset = eval_args.val_dataset
     args.val_batch_size = eval_args.val_batch_size
+    args.inference_type = getattr(eval_args, 'inference_type', 'generate')
     args.exp_name = f'eval_{args.exp_name}'
     args.disp_size = max(512, eval_args.disp_size)
     args.dataset_dir = './data'

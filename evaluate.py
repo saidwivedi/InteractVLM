@@ -39,6 +39,8 @@ from preprocess_data.constants import HUMAN_VIEW_DICT, OBJS_VIEW_DICT, DAMON_CAT
 
 
 def validate(val_loader, model_engine, epoch, loggers, args, ds_name):
+    inference_type = getattr(args, 'inference_type', 'forward')
+    print(f'----> validate() inference mode: {inference_type}')
     intersection_meter = AverageMeter("Intersec", ":6.3f", Summary.SUM)
     union_meter = AverageMeter("Union", ":6.3f", Summary.SUM)
     acc_iou_meter = AverageMeter("gIoU", ":6.3f", Summary.SUM)
@@ -82,7 +84,40 @@ def validate(val_loader, model_engine, epoch, loggers, args, ds_name):
         input_dict["cam_params"] = input_dict["cam_params"].to(dtype=get_dtype(args.precision))
 
         with torch.no_grad():
-            output_dict = model_engine(**input_dict)
+            if inference_type == 'generate':
+                labels_seq = input_dict["labels"][0]
+                answer_positions = (labels_seq != -100).nonzero(as_tuple=False)
+                if answer_positions.numel() > 0:
+                    answer_start = answer_positions[0].item()
+                    input_dict["input_ids"] = input_dict["input_ids"][:, :answer_start]
+
+                mask_path = input_dict["mask_paths_list"][0] if "mask_paths_list" in input_dict else None
+                eval_output = model_engine.module.evaluate(
+                    images_clip=input_dict["images_clip"],
+                    images=input_dict["images"],
+                    input_ids=input_dict["input_ids"],
+                    cam_params=input_dict["cam_params"],
+                    resize_list=input_dict["resize_list"],
+                    original_size_list=input_dict["resize_list"],
+                    lift2d_dict_path=mask_path,
+                    contact_type=input_dict["ds_name_list"][0],
+                    max_new_tokens=512,
+                )
+                output_dict = {
+                    "pred_masks": eval_output["pred_masks"],
+                    "gt_masks": input_dict["masks_list"],
+                }
+                if hcontact_metric:
+                    pred_3d = eval_output.get("pred_contact_3d", None)
+                    if pred_3d is None:
+                        pred_3d = torch.zeros_like(input_dict['gt_contact_3d'])
+                    output_dict["pred_human_3d_contact"] = pred_3d
+                elif ocontact_metric:
+                    output_dict["pred_object_3d_contact"] = eval_output.get("pred_contact_3d", None)
+                elif oafford_metric:
+                    output_dict["pred_object_3d_afford"] = eval_output.get("pred_contact_3d", None)
+            else:
+                output_dict = model_engine(**input_dict)
 
         # segmentation metrics
         intersection, union, acc_iou = get_segmentation_metrics(output_dict)
@@ -163,6 +198,28 @@ def validate(val_loader, model_engine, epoch, loggers, args, ds_name):
         saved_results_hC['avg_precision'] = hcontact_precision_meter.avg
         saved_results_hC['avg_recall'] = hcontact_recall_meter.avg
         saved_results_hC['avg_geo'] = hcontact_geo_meter.avg
+
+        if torch.distributed.is_initialized() and torch.distributed.get_world_size() > 1:
+            world_size = torch.distributed.get_world_size()
+
+            local_pred = torch.from_numpy(saved_results_hC['pred']).cuda()
+            local_gt = torch.from_numpy(saved_results_hC['gt']).cuda()
+            gathered_pred = [torch.zeros_like(local_pred) for _ in range(world_size)]
+            gathered_gt = [torch.zeros_like(local_gt) for _ in range(world_size)]
+            torch.distributed.all_gather(gathered_pred, local_pred)
+            torch.distributed.all_gather(gathered_gt, local_gt)
+
+            list_keys = ['imgnames', 'objnames', 'f1', 'geo']
+            local_lists = {k: saved_results_hC[k] for k in list_keys}
+            gathered_lists = [None] * world_size
+            torch.distributed.all_gather_object(gathered_lists, local_lists)
+
+            saved_results_hC['pred'] = torch.cat(gathered_pred).cpu().numpy()
+            saved_results_hC['gt'] = torch.cat(gathered_gt).cpu().numpy()
+            for k in list_keys:
+                saved_results_hC[k] = []
+                for g in gathered_lists:
+                    saved_results_hC[k].extend(g[k])
 
     if oafford_metric:
         oafford_sim_meter.all_reduce()
@@ -367,20 +424,21 @@ def get_damon_semantic_contact(saved_results_hC):
         print(f"{cat:20} | {m['num_samples']:7d} | {m['avg_f1']:.4f} | {m['precision']:.4f} | {m['recall']:.4f} | {m['geo']:.4f}")
 
 
-def get_damon_binary_contact(saved_results_hC):
-    # Binary contact
+def get_damon_binary_contact(saved_results_hC, threshold=0.5):
     imgwise = {}
     for i, name in enumerate(saved_results_hC['imgnames']):
         key = name[0]  # image name
+        pred_binary = (np.asarray(saved_results_hC['pred'][i]) >= threshold)
+        gt_binary = (np.asarray(saved_results_hC['gt'][i]) > 0)
         if key not in imgwise:
             imgwise[key] = {
-                'pred': saved_results_hC['pred'][i],
-                'gt': saved_results_hC['gt'][i],
+                'pred': pred_binary,
+                'gt': gt_binary,
                 'geo': saved_results_hC['geo'][i]
             }
         else:
-            imgwise[key]['pred'] = np.logical_or(imgwise[key]['pred'], saved_results_hC['pred'][i])
-            imgwise[key]['gt'] = np.logical_or(imgwise[key]['gt'], saved_results_hC['gt'][i])
+            imgwise[key]['pred'] = np.logical_or(imgwise[key]['pred'], pred_binary)
+            imgwise[key]['gt'] = np.logical_or(imgwise[key]['gt'], gt_binary)
             imgwise[key]['geo'] = max(imgwise[key]['geo'], saved_results_hC['geo'][i])
 
     f1_scores, geos = [], []
@@ -406,7 +464,7 @@ def get_damon_binary_contact(saved_results_hC):
     global_f1 = np.mean(f1_scores)
     global_geo = np.mean(geos)
 
-    print(f"\n[DAMON-HCONTACT - Binary Contact]")
+    print(f"\n[DAMON-HCONTACT - Binary Contact @ threshold={threshold}]")
     print(f"Global F1: {global_f1:.4f}, Precision: {global_precision:.4f}, Recall: {global_recall:.4f}, Geo: {global_geo:.4f}")
 
 
@@ -421,12 +479,17 @@ def parse_args(args):
     parser.add_argument("--val_batch_size", default=1, type=int)
     parser.add_argument('--log_wandb', default=False, type=lambda x: bool(strtobool(x)))
     parser.add_argument("--log_base_dir", default="./runs", type=str)
+    parser.add_argument("--inference_type", default='generate', type=str,
+                        choices=['forward', 'generate'])
     return parser.parse_args(args)
 
 def main_eval(args):
     
     args = parse_args(args)
     args = get_args_for_eval(args)
+
+    if torch.cuda.is_available():
+        torch.cuda.set_device(args.local_rank)
 
     print(f'disp_size: {args.disp_size}')
     args.log_dir = os.path.join(args.log_base_dir, args.exp_name)

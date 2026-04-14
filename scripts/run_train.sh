@@ -46,6 +46,7 @@ HC_MASK_TYPE="objectwise"
 OC_QUESTION_TYPE="afford_obj"
 HC_QUESTION_TYPE="parts"
 HC_TRAIN_FRACTION="1.0"
+HC_BODY_PART_DROPOUT_PROB="0.0"
 
 HC_LOSS_WEIGHT="0.0"
 OC_LOSS_WEIGHT="0.0"
@@ -69,15 +70,16 @@ DATASET_DIR="./data"
 # Function to set configuration based on numerical argument
 set_configuration() {
   case $1 in
-    "hcontact-damon")
+    "hcontact-damon-fix")
       EXP_NAME="interactvlm-3d-hcontact-damon"
       DATASET="hcontact_seg"
       SAMPLE_RATES="1"
       HC_SAM_INPUT_TYPE="norm"
-      HC_SAM_VIEW_TYPE="4MV-Z_Vitru"
+      HC_SAM_VIEW_TYPE="4MV-Z_Vitru_mv2"
       HC_MASK_TYPE="objectwise"
       HC_QUESTION_TYPE="parts"
       HC_TRAIN_FRACTION="1.0"
+      HC_BODY_PART_DROPOUT_PROB="0.5"
       BATCH_SIZE="8"
       GRAD_ACCUMULATION_STEPS="1"
       HCONTACT_SEG_DATA="damon_hcontact"
@@ -239,6 +241,7 @@ echo "deepspeed \
   --oC_question_type=$OC_QUESTION_TYPE \
   --hC_question_type=$HC_QUESTION_TYPE \
   --hC_train_fraction=$HC_TRAIN_FRACTION \
+  --hC_body_part_dropout_prob=$HC_BODY_PART_DROPOUT_PROB \
   --hC_loss_weight=$HC_LOSS_WEIGHT \
   --oC_loss_weight=$OC_LOSS_WEIGHT \
   --bce_loss_weight=$BCE_LOSS_WEIGHT \
@@ -289,6 +292,7 @@ deepspeed \
   --oC_question_type=$OC_QUESTION_TYPE \
   --hC_question_type=$HC_QUESTION_TYPE \
   --hC_train_fraction=$HC_TRAIN_FRACTION \
+  --hC_body_part_dropout_prob=$HC_BODY_PART_DROPOUT_PROB \
   --hC_loss_weight=$HC_LOSS_WEIGHT \
   --oC_loss_weight=$OC_LOSS_WEIGHT \
   --bce_loss_weight=$BCE_LOSS_WEIGHT \

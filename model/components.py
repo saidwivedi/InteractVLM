@@ -238,39 +238,43 @@ class HumanContact3DPredictor(nn.Module):
                     self._process_view(view_seg_map, view_idx, b, pred_3d_contacts, view_count)
         
         valid_vertices = view_count > 0
-        pred_3d_contacts[valid_vertices] /= view_count[valid_vertices]
-        
-        pred_3d_contacts = (pred_3d_contacts > self.threshold).to(dtype=dtype)
-        
+        pred_3d_contacts[valid_vertices] = pred_3d_contacts[valid_vertices] / view_count[valid_vertices]
+        pred_3d_contacts = torch.clamp(pred_3d_contacts, 0.0, 1.0)
+
         return pred_3d_contacts
 
     def _process_view(self, view_seg_map, view_idx, batch_idx, pred_3d_contacts, view_count):
         device = view_seg_map.device
         dtype = view_seg_map.dtype
-        
-        mask = (view_seg_map > self.threshold).to(dtype=dtype)
-        
+
+        view_seg_map = torch.clamp(view_seg_map, -20.0, 20.0)
+        mask_values = torch.sigmoid(view_seg_map).reshape(-1)
+
         p2v_map = self.pixel_to_vertex_map[view_idx].to(device)
         bary_coord = self.bary_coord_map[view_idx].to(device, dtype=dtype)
-        
-        mask_binary = mask > 0
-        vertices = p2v_map[mask_binary]
-        weights = bary_coord[mask_binary]
-        
-        vertices = vertices.reshape(-1, 3)
-        weights = weights.reshape(-1, 3)
-        
+        vertices = p2v_map.reshape(-1, 3)
+        weights = bary_coord.reshape(-1, 3)
+
         valid_mask = (vertices >= 0) & (vertices < self.num_vertices)
         valid_mask = valid_mask.all(dim=1)
         vertices = vertices[valid_mask]
         weights = weights[valid_mask]
-        
+        mask_values = mask_values[valid_mask]
+
         if vertices.numel() == 0:
             return
-        
+
+        view_votes = torch.zeros_like(pred_3d_contacts[batch_idx])
+        view_counts = torch.zeros_like(view_count[batch_idx])
         for i in range(3):
-            pred_3d_contacts[batch_idx].scatter_add_(0, vertices[:, i].long(), weights[:, i])
-            view_count[batch_idx].scatter_add_(0, vertices[:, i].long(), torch.ones_like(weights[:, i]))
+            view_votes.scatter_add_(0, vertices[:, i].long(), weights[:, i] * mask_values)
+            view_counts.scatter_add_(0, vertices[:, i].long(), weights[:, i])
+
+        valid_view_vertices = view_counts > 0
+        view_votes[valid_view_vertices] = view_votes[valid_view_vertices] / view_counts[valid_view_vertices]
+
+        pred_3d_contacts[batch_idx] = pred_3d_contacts[batch_idx] + view_votes
+        view_count[batch_idx] = view_count[batch_idx] + valid_view_vertices.to(dtype)
 
 class ObjectPCAfford3DPredictor(nn.Module):
     def __init__(self, oC_sam_view_type, multiview_channels, num_points=2048, threshold=0.3):

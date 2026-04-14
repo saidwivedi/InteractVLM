@@ -33,7 +33,11 @@
         <img src="https://img.shields.io/badge/arXiv-2504.05303-b31b1b" alt="arXiv">
     </a>
     <img src="https://img.shields.io/badge/Status-Code%20Released-green" alt="Status: Code Released">
-</h5><br />
+</h5>
+
+<p align="center">See <a href="./FIX.md">FIX.md</a> for recent fixes, improvements, and updated evaluation numbers.</p>
+
+<br />
 
 <div style="display:flex;">
     <img src="assets/teaser.png">
