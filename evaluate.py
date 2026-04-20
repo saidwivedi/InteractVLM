@@ -367,12 +367,16 @@ def get_damon_semantic_contact(saved_results_hC):
         geo = [saved_results_hC['geo'][i] for i in indices]
         f1s = [saved_results_hC['f1'][i] for i in indices]
 
-        tp = sum(np.sum(np.logical_and(p, g)) for p, g in zip(preds, gts))
-        pred_pos = sum(np.sum(p) for p in preds)
-        gt_pos = sum(np.sum(g) for g in gts)
+        precs, recs = [], []
+        for p, g in zip(preds, gts):
+            tpi = float(np.sum(np.logical_and(p, g)))
+            ppi = float(np.sum(p))
+            gpi = float(np.sum(g))
+            precs.append(tpi / ppi if ppi > 0 else 0.0)
+            recs.append(tpi / gpi if gpi > 0 else 0.0)
 
-        precision = tp / pred_pos if pred_pos > 0 else 0
-        recall = tp / gt_pos if gt_pos > 0 else 0
+        precision = float(np.mean(precs))
+        recall = float(np.mean(recs))
         f1 = np.mean(f1s)
         geo_avg = np.mean(geo)
 
@@ -402,12 +406,16 @@ def get_damon_semantic_contact(saved_results_hC):
         geo = [saved_results_hC['geo'][i] for i in indices]
         f1s = [saved_results_hC['f1'][i] for i in indices]
 
-        tp = sum(np.sum(np.logical_and(p, g)) for p, g in zip(preds, gts))
-        pred_pos = sum(np.sum(p) for p in preds)
-        gt_pos = sum(np.sum(g) for g in gts)
+        precs, recs = [], []
+        for p, g in zip(preds, gts):
+            tpi = float(np.sum(np.logical_and(p, g)))
+            ppi = float(np.sum(p))
+            gpi = float(np.sum(g))
+            precs.append(tpi / ppi if ppi > 0 else 0.0)
+            recs.append(tpi / gpi if gpi > 0 else 0.0)
 
-        precision = tp / pred_pos if pred_pos > 0 else 0
-        recall = tp / gt_pos if gt_pos > 0 else 0
+        precision = float(np.mean(precs))
+        recall = float(np.mean(recs))
         f1 = np.mean(f1s)
         geo_avg = np.mean(geo)
 
@@ -441,8 +449,7 @@ def get_damon_binary_contact(saved_results_hC, threshold=0.5):
             imgwise[key]['gt'] = np.logical_or(imgwise[key]['gt'], gt_binary)
             imgwise[key]['geo'] = max(imgwise[key]['geo'], saved_results_hC['geo'][i])
 
-    f1_scores, geos = [], []
-    tp, pred_pos, gt_pos = 0, 0, 0
+    f1_scores, prec_scores, rec_scores, geos = [], [], [], []
     for v in imgwise.values():
         p, g = v['pred'], v['gt']
         tpi = np.sum(np.logical_and(p, g))
@@ -453,16 +460,14 @@ def get_damon_binary_contact(saved_results_hC, threshold=0.5):
         f1 = 2 * prec * rec / (prec + rec) if (prec + rec) else 0
 
         f1_scores.append(f1)
+        prec_scores.append(prec)
+        rec_scores.append(rec)
         geos.append(v['geo'])
 
-        tp += tpi
-        pred_pos += ppi
-        gt_pos += gpi
-
-    global_precision = tp / pred_pos if pred_pos else 0
-    global_recall = tp / gt_pos if gt_pos else 0
-    global_f1 = np.mean(f1_scores)
-    global_geo = np.mean(geos)
+    global_precision = float(np.mean(prec_scores))
+    global_recall = float(np.mean(rec_scores))
+    global_f1 = float(np.mean(f1_scores))
+    global_geo = float(np.mean(geos))
 
     print(f"\n[DAMON-HCONTACT - Binary Contact @ threshold={threshold}]")
     print(f"Global F1: {global_f1:.4f}, Precision: {global_precision:.4f}, Recall: {global_recall:.4f}, Geo: {global_geo:.4f}")

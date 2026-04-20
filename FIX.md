@@ -57,8 +57,8 @@ test split (1370 samples) with `inference_type=generate` and threshold `0.5`:
 
 | Model | F1 | Precision | Recall |
 |---|---|---|---|
-| `interactvlm-3d-hcontact-damon-fix` | **0.7032** | 0.6466 | 0.7546 |
-| `interactvlm-3d-hcontact-damon-noParts` | **0.6446** | 0.6589 | 0.6312 |
+| `interactvlm-3d-hcontact-damon-fix` | **70.32** | 67.91 | 78.91 |
+| `interactvlm-3d-hcontact-damon-noParts` | **64.46** | 67.34 | 68.31 |
 
 ### Semantic contact (per-object)
 
@@ -76,14 +76,15 @@ test split (1370 samples) with `inference_type=generate` and threshold `0.5`:
     </tr>
   </thead>
   <tbody>
-    <tr><td>transport</td><td>87</td><td>0.7225</td><td>0.8234</td><td>0.9954</td><td>0.7035</td><td>1.0042</td><td>0.9954</td></tr>
-    <tr><td>sports</td><td>305</td><td>0.7244</td><td>0.8875</td><td>0.9952</td><td>0.6664</td><td>0.9172</td><td>0.9952</td></tr>
-    <tr><td>kitchen</td><td>38</td><td>0.6535</td><td>0.8610</td><td>0.9916</td><td>0.5732</td><td>0.8944</td><td>0.9916</td></tr>
-    <tr><td>food</td><td>32</td><td>0.6205</td><td>0.7516</td><td>0.9917</td><td>0.5608</td><td>0.8162</td><td>0.9917</td></tr>
-    <tr><td>accessory</td><td>47</td><td>0.6034</td><td>0.8397</td><td>0.9969</td><td>0.4645</td><td>0.6815</td><td>0.9969</td></tr>
-    <tr><td>furniture</td><td>146</td><td>0.5890</td><td>0.7370</td><td>0.9944</td><td>0.4504</td><td>0.5817</td><td>0.9944</td></tr>
-    <tr><td>everyday-objects</td><td>174</td><td>0.5498</td><td>0.8507</td><td>0.9878</td><td>0.5217</td><td>0.7747</td><td>0.9878</td></tr>
-    <tr><td><b>DAMON (weighted)</b></td><td><b>1370</b></td><td><b>0.6649</b></td><td><b>0.8585</b></td><td><b>0.9947</b></td><td><b>0.6098</b></td><td><b>0.7750</b></td><td><b>0.9947</b></td></tr>
+    <tr><td>transport</td><td>87</td><td>72.25</td><td>67.84</td><td>82.36</td><td>70.35</td><td>70.49</td><td>76.97</td></tr>
+    <tr><td>sports</td><td>305</td><td>72.44</td><td>71.20</td><td>81.47</td><td>66.64</td><td>69.16</td><td>71.84</td></tr>
+    <tr><td>kitchen</td><td>38</td><td>65.35</td><td>62.12</td><td>75.31</td><td>57.32</td><td>57.04</td><td>64.85</td></tr>
+    <tr><td>food</td><td>32</td><td>62.05</td><td>57.61</td><td>76.67</td><td>56.08</td><td>52.35</td><td>70.82</td></tr>
+    <tr><td>accessory</td><td>47</td><td>60.34</td><td>56.15</td><td>70.05</td><td>46.45</td><td>47.65</td><td>51.32</td></tr>
+    <tr><td>furniture</td><td>146</td><td>58.90</td><td>54.04</td><td>72.87</td><td>45.04</td><td>57.59</td><td>42.78</td></tr>
+    <tr><td>everyday-objects</td><td>174</td><td>54.98</td><td>53.62</td><td>63.42</td><td>52.17</td><td>50.45</td><td>64.20</td></tr>
+    <tr><td>supporting</td><td>541</td><td>68.84</td><td>67.43</td><td>76.78</td><td>65.23</td><td>67.14</td><td>70.17</td></tr>
+    <tr><td><b>DAMON (weighted)</b></td><td><b>1370</b></td><td><b>66.49</b></td><td><b>64.35</b></td><td><b>75.79</b></td><td><b>60.98</b></td><td><b>63.37</b></td><td><b>66.52</b></td></tr>
   </tbody>
 </table>
 
