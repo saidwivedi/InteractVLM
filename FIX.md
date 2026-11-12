@@ -3,6 +3,11 @@
 This note tracks fixes and improvements we are rolling into the released
 code and models.
 
+## 2026-11-12
+
+- **Geodesic distance.** Added the geodesic distance (cm) to the DAMON
+  tables below.
+
 ## 2026-04-16
 
 The changes below make the released models more robust for in-the-wild
@@ -55,10 +60,10 @@ test split (1370 samples) with `inference_type=generate` and threshold `0.5`:
 
 ### Binary contact (per-image)
 
-| Model | F1 | Precision | Recall |
-|---|---|---|---|
-| `interactvlm-3d-hcontact-damon-fix` | **70.32** | 67.91 | 78.91 |
-| `interactvlm-3d-hcontact-damon-noParts` | **64.46** | 67.34 | 68.31 |
+| Model | F1 | Precision | Recall | Geodesic (cm) |
+|---|---|---|---|---|
+| `interactvlm-3d-hcontact-damon-fix` | **70.32** | 67.91 | 78.91 | 11.80 |
+| `interactvlm-3d-hcontact-damon-noParts` | **64.46** | 67.34 | 68.31 | 16.25 |
 
 ### Semantic contact (per-object)
 
@@ -67,24 +72,24 @@ test split (1370 samples) with `inference_type=generate` and threshold `0.5`:
     <tr>
       <th rowspan="2">Category</th>
       <th rowspan="2"># samples</th>
-      <th colspan="3">with body parts (<code>damon-fix</code>)</th>
-      <th colspan="3">without body parts (<code>damon-noParts</code>)</th>
+      <th colspan="4">with body parts (<code>damon-fix</code>)</th>
+      <th colspan="4">without body parts (<code>damon-noParts</code>)</th>
     </tr>
     <tr>
-      <th>F1</th><th>Precision</th><th>Recall</th>
-      <th>F1</th><th>Precision</th><th>Recall</th>
+      <th>F1</th><th>Precision</th><th>Recall</th><th>Geodesic (cm)</th>
+      <th>F1</th><th>Precision</th><th>Recall</th><th>Geodesic (cm)</th>
     </tr>
   </thead>
   <tbody>
-    <tr><td>transport</td><td>87</td><td>72.25</td><td>67.84</td><td>82.36</td><td>70.35</td><td>70.49</td><td>76.97</td></tr>
-    <tr><td>sports</td><td>305</td><td>72.44</td><td>71.20</td><td>81.47</td><td>66.64</td><td>69.16</td><td>71.84</td></tr>
-    <tr><td>kitchen</td><td>38</td><td>65.35</td><td>62.12</td><td>75.31</td><td>57.32</td><td>57.04</td><td>64.85</td></tr>
-    <tr><td>food</td><td>32</td><td>62.05</td><td>57.61</td><td>76.67</td><td>56.08</td><td>52.35</td><td>70.82</td></tr>
-    <tr><td>accessory</td><td>47</td><td>60.34</td><td>56.15</td><td>70.05</td><td>46.45</td><td>47.65</td><td>51.32</td></tr>
-    <tr><td>furniture</td><td>146</td><td>58.90</td><td>54.04</td><td>72.87</td><td>45.04</td><td>57.59</td><td>42.78</td></tr>
-    <tr><td>everyday-objects</td><td>174</td><td>54.98</td><td>53.62</td><td>63.42</td><td>52.17</td><td>50.45</td><td>64.20</td></tr>
-    <tr><td>supporting</td><td>541</td><td>68.84</td><td>67.43</td><td>76.78</td><td>65.23</td><td>67.14</td><td>70.17</td></tr>
-    <tr><td><b>DAMON (weighted)</b></td><td><b>1370</b></td><td><b>66.49</b></td><td><b>64.35</b></td><td><b>75.79</b></td><td><b>60.98</b></td><td><b>63.37</b></td><td><b>66.52</b></td></tr>
+    <tr><td>transport</td><td>87</td><td>72.25</td><td>67.84</td><td>82.36</td><td>17.28</td><td>70.35</td><td>70.49</td><td>76.97</td><td>18.38</td></tr>
+    <tr><td>sports</td><td>305</td><td>72.44</td><td>71.20</td><td>81.47</td><td>12.70</td><td>66.64</td><td>69.16</td><td>71.84</td><td>20.29</td></tr>
+    <tr><td>kitchen</td><td>38</td><td>65.35</td><td>62.12</td><td>75.31</td><td>22.24</td><td>57.32</td><td>57.04</td><td>64.85</td><td>33.92</td></tr>
+    <tr><td>food</td><td>32</td><td>62.05</td><td>57.61</td><td>76.67</td><td>16.30</td><td>56.08</td><td>52.35</td><td>70.82</td><td>27.17</td></tr>
+    <tr><td>accessory</td><td>47</td><td>60.34</td><td>56.15</td><td>70.05</td><td>10.62</td><td>46.45</td><td>47.65</td><td>51.32</td><td>23.41</td></tr>
+    <tr><td>furniture</td><td>146</td><td>58.90</td><td>54.04</td><td>72.87</td><td>8.75</td><td>45.04</td><td>57.59</td><td>42.78</td><td>10.19</td></tr>
+    <tr><td>everyday-objects</td><td>174</td><td>54.98</td><td>53.62</td><td>63.42</td><td>34.81</td><td>52.17</td><td>50.45</td><td>64.20</td><td>43.09</td></tr>
+    <tr><td>supporting</td><td>541</td><td>68.84</td><td>67.43</td><td>76.78</td><td>16.90</td><td>65.23</td><td>67.14</td><td>70.17</td><td>19.26</td></tr>
+    <tr><td><b>DAMON (weighted)</b></td><td><b>1370</b></td><td><b>66.49</b></td><td><b>64.35</b></td><td><b>75.79</b></td><td><b>17.31</b></td><td><b>60.98</b></td><td><b>63.37</b></td><td><b>66.52</b></td><td><b>22.23</b></td></tr>
   </tbody>
 </table>
 

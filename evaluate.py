@@ -125,7 +125,7 @@ def validate(val_loader, model_engine, epoch, loggers, args, ds_name):
         # human contact metrics
         if hcontact_metric:
             f1, precision, recall = get_h_contact_metrics(input_dict['gt_contact_3d'], output_dict['pred_human_3d_contact'])
-            fp_geo, _ = get_h_geo_metric(input_dict['gt_contact_3d'], output_dict['pred_human_3d_contact'])
+            fp_geo, _ = get_h_geo_metric(output_dict['pred_human_3d_contact'], input_dict['gt_contact_3d'])
             hcontact_f1_meter.update(f1)
             hcontact_precision_meter.update(precision)
             hcontact_recall_meter.update(recall)
@@ -442,12 +442,10 @@ def get_damon_binary_contact(saved_results_hC, threshold=0.5):
             imgwise[key] = {
                 'pred': pred_binary,
                 'gt': gt_binary,
-                'geo': saved_results_hC['geo'][i]
             }
         else:
             imgwise[key]['pred'] = np.logical_or(imgwise[key]['pred'], pred_binary)
             imgwise[key]['gt'] = np.logical_or(imgwise[key]['gt'], gt_binary)
-            imgwise[key]['geo'] = max(imgwise[key]['geo'], saved_results_hC['geo'][i])
 
     f1_scores, prec_scores, rec_scores, geos = [], [], [], []
     for v in imgwise.values():
@@ -462,7 +460,12 @@ def get_damon_binary_contact(saved_results_hC, threshold=0.5):
         f1_scores.append(f1)
         prec_scores.append(prec)
         rec_scores.append(rec)
-        geos.append(v['geo'])
+        # false-positive geodesic on the unioned masks, same protocol as the F1 above
+        fp_geo, _ = get_h_geo_metric(
+            torch.from_numpy(p.reshape(1, -1).astype(np.float32)),
+            torch.from_numpy(g.reshape(1, -1).astype(np.float32)),
+        )
+        geos.append(fp_geo)
 
     global_precision = float(np.mean(prec_scores))
     global_recall = float(np.mean(rec_scores))
